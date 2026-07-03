@@ -380,14 +380,19 @@
     <!-- Metrics -->
     <div class="metrics">
       <div class="metric">
-        <div class="label">👥 ผู้ใช้งาน ASL ทั้งหมด</div>
+        <div class="label">👥 ผู้ใช้งานที่ลงทะเบียนทั้งหมด</div>
         <div class="value" id="aslUsers">—</div>
-        <div class="sub">บัญชีที่ลงทะเบียนกับสมาคม</div>
+        <div class="sub">คน</div>
       </div>
       <div class="metric">
-        <div class="label">🔗 Node ที่เชื่อมต่ออยู่</div>
-        <div class="value green" id="connectedCount">—</div>
-        <div class="sub">เชื่อมต่อกับ 620540 ขณะนี้</div>
+        <div class="label">🎙️ กำลังใช้งานอยู่</div>
+        <div class="value green" id="activeUsers">—</div>
+        <div class="sub">คน</div>
+      </div>
+      <div class="metric">
+        <div class="label">🔗 Node ภายนอกที่เชื่อมต่ออยู่</div>
+        <div class="value" id="externalNodes">—</div>
+        <div class="sub">Node</div>
       </div>
     </div>
 
@@ -434,7 +439,10 @@ async function loadStatus() {
     }
 
     document.getElementById('aslUsers').textContent = s.asl_users ?? '—';
-    document.getElementById('connectedCount').textContent = s.connected_count ?? 0;
+    const active = s.active_count ?? (s.connected_nodes ? s.connected_nodes.filter(n => n.endsWith('-P')).length : 0);
+    const external = s.external_count ?? ((s.connected_count ?? 0) - active);
+    document.getElementById('activeUsers').textContent = active;
+    document.getElementById('externalNodes').textContent = external;
 
     const list = document.getElementById('connectedList');
     if (s.connected_nodes && s.connected_nodes.length > 0) {
