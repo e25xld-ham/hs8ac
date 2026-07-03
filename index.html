@@ -172,6 +172,21 @@
   }
   .service.line-card .go { color: #06c755; }
   .service.fb-card .go { color: #1877f2; }
+  .service.featured {
+    border: 2px solid #06c755;
+    background: #f0fdf4;
+    position: relative;
+  }
+  .service.featured:hover { border-color: #059669; }
+  .feat-badge {
+    position: absolute;
+    top: -12px; left: 14px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #0a1628;
+    font-size: 12px; font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 50px;
+  }
 
   /* About */
   .service.expand { cursor: pointer; }
@@ -258,6 +273,13 @@
     <!-- Services -->
     <div class="section-title">🛎️ บริการสมาชิก</div>
     <div class="services">
+      <a class="service line-card featured" href="https://lin.ee/UcqTYjEo" target="_blank">
+        <div class="feat-badge">⭐ บริการยอดนิยม</div>
+        <div class="icon">💬</div>
+        <h3>ต่ออายุบัตรสมาชิก / สอบถามข้อมูล</h3>
+        <p>ติดต่อเจ้าหน้าที่สมาคมผ่าน LINE Official Account</p>
+        <div class="go">เพิ่มเพื่อนใน LINE →</div>
+      </a>
       <a class="service" href="https://e25xld-ham.github.io/dvswitch-manual/register.html">
         <div class="icon">📝</div>
         <h3>ลงทะเบียนใช้งาน AllStarLink ของสมาคม</h3>
@@ -269,12 +291,6 @@
         <h3>คู่มือการใช้งาน DVSWITCH Mobile</h3>
         <p>วิธีติดตั้งและตั้งค่าแอปพลิเคชันทีละขั้นตอน พร้อมภาพประกอบ</p>
         <div class="go">เปิดคู่มือ →</div>
-      </a>
-      <a class="service line-card" href="https://lin.ee/UcqTYjEo" target="_blank">
-        <div class="icon">💬</div>
-        <h3>ต่ออายุบัตรสมาชิก / สอบถามข้อมูล</h3>
-        <p>ติดต่อเจ้าหน้าที่สมาคมผ่าน LINE Official Account</p>
-        <div class="go">เพิ่มเพื่อนใน LINE →</div>
       </a>
     </div>
 
@@ -333,7 +349,10 @@
     <div class="updated" id="updated"></div>
   </div>
 
-  <div class="footer">ช่วยชาติ ช่วยสังคม เราสุขใจ · Node 620540 จังหวัดชุมพร</div>
+  <div class="footer">
+    ช่วยชาติ ช่วยสังคม เราสุขใจ · Node 620540 จังหวัดชุมพร<br>
+    <span style="font-size:11px;">พัฒนาระบบโดย <a href="https://www.qrz.com/db/E25XLD" target="_blank" style="color:#FFD700;text-decoration:none;font-weight:700;">E25XLD</a> also <a href="https://www.qrz.com/db/KE9CYN" target="_blank" style="color:#FFD700;text-decoration:none;font-weight:700;">KE9CYN</a></span>
+  </div>
 </div>
 
 <script>
