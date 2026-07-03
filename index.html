@@ -454,7 +454,7 @@ async function loadStatus() {
 
     if (s.updated_display) {
       document.getElementById('updated').textContent =
-        '🕐 ข้อมูลอัปเดตล่าสุด ' + s.updated_display + ' (อัปเดตอัตโนมัติทุก 5 นาที)';
+        '🕐 ข้อมูลอัปเดตล่าสุด ' + s.updated_display + ' (อัปเดตอัตโนมัติทุก 10 นาที)';
     }
   } catch (e) {
     document.getElementById('statusSub').textContent = 'ยังไม่มีข้อมูลสถานะ';
