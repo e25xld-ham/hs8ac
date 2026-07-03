@@ -254,6 +254,59 @@
     color: #92400e;
   }
 
+  .talking-now {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #991b1b;
+    font-weight: 700;
+  }
+  .talking-now .chip {
+    display: inline-block;
+    background: #dc2626;
+    color: white;
+    font-family: monospace;
+    font-size: 13px;
+    padding: 2px 12px;
+    border-radius: 50px;
+    margin-left: 6px;
+  }
+  .lh-card {
+    border: 2px solid #e0e8ff;
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .lh-head {
+    font-size: 14px; font-weight: 700; color: #0d2654;
+    margin-bottom: 8px;
+  }
+  .lh-keyups {
+    float: right;
+    font-size: 12px; font-weight: 600; color: #888;
+  }
+  .lh-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px dashed #e0e8ff;
+    font-size: 13px;
+  }
+  .lh-row:last-child { border-bottom: none; }
+  .lh-call {
+    font-family: monospace; font-weight: 700; color: #0d2654;
+    flex: 1;
+  }
+  .lh-time { color: #888; }
+  .lh-dur {
+    background: #eff6ff; color: #1a4a9e;
+    font-size: 12px; font-weight: 700;
+    padding: 2px 10px; border-radius: 50px;
+    min-width: 52px; text-align: center;
+  }
+
   .updated {
     text-align: center;
     font-size: 12px; color: #999;
@@ -374,7 +427,10 @@
         </div>
       </div>
       <div class="connected-list" id="connectedList" style="display:none"></div>
+      <div class="talking-now" id="talkingNow" style="display:none"></div>
     </div>
+
+    <div id="playerBox" style="display:none;margin-bottom:18px;text-align:center;"></div>
 
     <!-- Metrics -->
     <div class="metrics">
@@ -395,6 +451,11 @@
       </div>
     </div>
 
+    <div class="lh-card" id="lhCard" style="display:none">
+      <div class="lh-head">🎧 ใช้งานล่าสุด (Last Heard) <span class="lh-keyups" id="keyupsToday"></span></div>
+      <div id="lhList"></div>
+    </div>
+
     <div class="updated" id="updated"></div>
   </div>
 
@@ -409,12 +470,26 @@
 <script>
 // ใส่ลิงก์สตรีมสดตรงนี้ เช่น 'https://broadcastify.com/listen/feed/xxxxx'
 const STREAM_URL = 'https://www.broadcastify.com/listen/feed/47437';
+// ใส่ domain key ของ Broadcastify (ขอจากหน้า embed) เพื่อฝัง player ในหน้านี้เลย
+const BROADCASTIFY_KEY = '';
+const BROADCASTIFY_FEED = '47437';
 
 if (STREAM_URL) {
   const btn = document.getElementById('streamBtn');
   btn.href = STREAM_URL;
   btn.style.display = 'inline-flex';
   document.getElementById('streamSoon').style.display = 'none';
+}
+
+if (BROADCASTIFY_KEY) {
+  const box = document.getElementById('playerBox');
+  box.innerHTML = '<iframe width="325" height="245" style="border:2px solid #e0e8ff;border-radius:16px;max-width:100%;" src="https://api.broadcastify.com/embed/player/?key=' + BROADCASTIFY_KEY + '&feedId=' + BROADCASTIFY_FEED + '&html5=1&stats=1"></iframe>';
+  box.style.display = 'block';
+}
+
+function fmtDur(d) {
+  if (d < 60) return d + ' วิ';
+  return Math.floor(d / 60) + ' นาที ' + (d % 60) + ' วิ';
 }
 
 async function loadStatus() {
@@ -450,6 +525,27 @@ async function loadStatus() {
         s.connected_nodes.map(n => '<span class="chip">' + n + '</span>').join('');
     } else {
       list.style.display = 'none';
+    }
+
+    const talkBox = document.getElementById('talkingNow');
+    if (s.talking && s.talking.length > 0) {
+      talkBox.style.display = 'block';
+      talkBox.innerHTML = '🔴 กำลังพูดขณะนี้:' +
+        s.talking.map(n => '<span class="chip">' + n + '</span>').join('');
+    } else {
+      talkBox.style.display = 'none';
+    }
+
+    if (s.lastheard && s.lastheard.length > 0) {
+      document.getElementById('lhCard').style.display = 'block';
+      document.getElementById('lhList').innerHTML = s.lastheard.map(e =>
+        '<div class="lh-row"><span class="lh-call">' + e.c + '</span>' +
+        '<span class="lh-time">' + e.hm + '</span>' +
+        '<span class="lh-dur">' + fmtDur(e.d) + '</span></div>'
+      ).join('');
+      if (s.keyups_today != null) {
+        document.getElementById('keyupsToday').textContent = 'วันนี้กดคีย์ ' + s.keyups_today + ' ครั้ง';
+      }
     }
 
     if (s.updated_display) {
