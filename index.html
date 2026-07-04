@@ -486,7 +486,7 @@
         <i style="background:#f0f4fb"></i><i style="background:#dbe8f9"></i><i style="background:#a9cbf0"></i><i style="background:#64a1e0"></i><i style="background:#2d74c4"></i><i style="background:#0d447c"></i>
         <span>หนาแน่น</span>
       </div>
-      <div class="usage-sub" style="margin-top:14px;">Airtime ต่อชั่วโมง — 24 ชม.ล่าสุด</div>
+      <div class="usage-sub" style="margin-top:14px;">Airtime ต่อชั่วโมง — วันนี้ (00:00–23:59 น.)</div>
       <div class="bars" id="usageBars"></div>
       <div class="bars-x" id="usageBarsX"></div>
     </div>
@@ -614,8 +614,9 @@ async function loadStatus() {
         '<span class="lh-time">' + e.hm + '</span>' +
         '<span class="lh-dur">' + fmtDur(e.d) + '</span></div>'
       ).join('');
-      if (s.keyups_today != null) {
-        document.getElementById('keyupsToday').textContent = 'วันนี้กดคีย์ ' + s.keyups_today + ' ครั้ง';
+      const kt = s.usage?.today?.keys ?? s.keyups_today;
+      if (kt != null) {
+        document.getElementById('keyupsToday').textContent = 'วันนี้กดคีย์ ' + kt + ' ครั้ง';
       }
     }
 
