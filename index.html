@@ -355,9 +355,21 @@
   .heat-legend i { width: 13px; height: 9px; border-radius: 2px; display: inline-block; }
   .bars {
     display: flex; align-items: flex-end; gap: 3px;
-    height: 70px;
+    height: 84px;
   }
-  .bars div { flex: 1; border-radius: 2px 2px 0 0; min-height: 2px; }
+  .bar-col {
+    flex: 1; height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: flex-end; align-items: center;
+  }
+  .bar-val {
+    font-size: 9px; color: #555; font-weight: 600;
+    line-height: 1; margin-bottom: 2px; white-space: nowrap;
+  }
+  .bar-fill {
+    width: 100%; border-radius: 2px 2px 0 0; min-height: 2px;
+    display: flex; flex-direction: column;
+  }
   .bars-x {
     display: flex; justify-content: space-between;
     font-size: 9px; color: #aaa; margin-top: 3px;
@@ -520,7 +532,7 @@
         <i style="background:#f0f4fb"></i><i style="background:#dbe8f9"></i><i style="background:#a9cbf0"></i><i style="background:#64a1e0"></i><i style="background:#2d74c4"></i><i style="background:#0d447c"></i>
         <span>busy</span>
       </div>
-      <div class="usage-sub" style="margin-top:14px;">Airtime per hour — today (00:00–23:59)</div>
+      <div class="usage-sub" style="margin-top:14px;">Airtime per hour (min) — today (00:00–23:59)</div>
       <div class="bars" id="usageBars"></div>
       <div class="bars-x" id="usageBarsX"></div>
       <div class="stack-legend" id="barsLegend" style="margin-top:5px;"></div>
@@ -624,7 +636,7 @@ function renderUsage(u) {
   const maxAir = Math.max(60, ...bars.map(b => b.air));
   document.getElementById('usageBars').innerHTML = bars.map(b => {
     const rf = b.rf ?? 0, asl = Math.max(0, b.air - rf);
-    const h = Math.max(3, Math.round(b.air / maxAir * 100));
+    const h = Math.max(3, Math.round(b.air / maxAir * 82));
     const tip = b.h + ':00 \u2014 ' + fmtAir(b.air) +
       ' (\ud83d\udcfb RF ' + fmtAir(rf) + ' \u00b7 \ud83c\udf10 AllStar ' + fmtAir(asl) +
       ' \u00b7 ' + b.keys + ' keyups)';
@@ -633,7 +645,13 @@ function renderUsage(u) {
       if (asl > 0) inner += '<div style="height:' + Math.round(asl / b.air * 100) + '%;background:#16a34a;"></div>';
       if (rf > 0) inner += '<div style="flex:1;background:#185FA5;"></div>';
     }
-    return '<div style="height:' + h + '%;display:flex;flex-direction:column;background:#dbe8f9;" title="' + tip + '">' + inner + '</div>';
+    let label = '';
+    if (b.air > 0) {
+      const m = Math.round(b.air / 60);
+      label = '<div class="bar-val">' + (m >= 1 ? m : '<1') + '</div>';
+    }
+    return '<div class="bar-col" title="' + tip + '">' + label +
+      '<div class="bar-fill" style="height:' + h + '%;background:#dbe8f9;">' + inner + '</div></div>';
   }).join('');
   document.getElementById('usageBarsX').innerHTML = bars.map((b, i) =>
     '<span>' + (i % 4 === 0 ? b.h : '') + '</span>').join('');
