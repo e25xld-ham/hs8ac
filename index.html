@@ -638,10 +638,11 @@ function svgBattery(cx, name, ah, pct, active, note) {
   return s;
 }
 
-function flowPath(id, d, active) {
+function flowPath(id, d, active, color) {
+  color = color || '#16a34a';
   if (!active) return '<path d="' + d + '" fill="none" stroke="#dbe8f9" stroke-width="2"/>';
-  return '<path id="' + id + '" d="' + d + '" fill="none" stroke="#16a34a" stroke-width="2.5"/>' +
-    '<circle r="5" fill="#16a34a"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#' + id + '"/></animateMotion></circle>';
+  return '<path id="' + id + '" d="' + d + '" fill="none" stroke="' + color + '" stroke-width="2.5"/>' +
+    '<circle r="5" fill="' + color + '"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#' + id + '"/></animateMotion></circle>';
 }
 
 function powerDiagram(onGrid, isBat2, pct1, pct2) {
@@ -696,11 +697,38 @@ function powerDiagram(onGrid, isBat2, pct1, pct2) {
     flowPath('fB1', 'M240,96 L240,168', !onGrid && !isBat2) +
     flowPath('fB2', 'M370,96 L370,185 L282,185', !onGrid && isBat2) +
     flowPath('fDS', 'M430,96 L430,148', true);
-  return '<svg viewBox="0 0 480 232" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-bottom:6px;">' +
+  const sunRays =
+    '<circle cx="372" cy="20" r="8" fill="#f59e0b"/>' +
+    '<line x1="372" y1="9" x2="372" y2="4" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
+    '<line x1="372" y1="31" x2="372" y2="36" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
+    '<line x1="361" y1="20" x2="356" y2="20" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
+    '<line x1="383" y1="20" x2="388" y2="20" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
+    '<line x1="364" y1="12" x2="360" y2="8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
+    '<line x1="380" y1="12" x2="384" y2="8" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
+    '<line x1="364" y1="28" x2="360" y2="32" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
+    '<line x1="380" y1="28" x2="384" y2="32" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>';
+  const solar =
+    '<g' + (onGrid ? '' : ' opacity="0.35"') + '>' +
+    '<text x="304" y="10" text-anchor="middle" font-size="8.5" font-weight="700" fill="' + (onGrid ? '#b45309' : '#64748b') + '">SOLAR ' + (onGrid ? 'CHARGING ☀️' : 'STANDBY') + '</text>' +
+    '<polygon points="280,16 344,16 336,46 272,46" fill="#1d4ed8" stroke="#0d2654" stroke-width="2"/>' +
+    '<line x1="278" y1="26" x2="342" y2="26" stroke="#93c5fd" stroke-width="1"/>' +
+    '<line x1="275" y1="36" x2="339" y2="36" stroke="#93c5fd" stroke-width="1"/>' +
+    '<line x1="296" y1="16" x2="288" y2="46" stroke="#93c5fd" stroke-width="1"/>' +
+    '<line x1="312" y1="16" x2="304" y2="46" stroke="#93c5fd" stroke-width="1"/>' +
+    '<line x1="328" y1="16" x2="320" y2="46" stroke="#93c5fd" stroke-width="1"/>' +
+    '<line x1="304" y1="46" x2="304" y2="54" stroke="#475569" stroke-width="3"/>' +
+    '</g>' +
+    (onGrid ? '<g><animate attributeName="opacity" values="1;0.55;1" dur="2s" repeatCount="indefinite"/>' + sunRays + '</g>' : '') +
+    flowPath('fSol1', 'M284,48 C290,70 293,85 293,106', onGrid, '#f59e0b') +
+    flowPath('fSol2', 'M324,48 C336,70 348,85 348,106', onGrid, '#f59e0b');
+  return '<svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-bottom:6px;">' +
+    solar +
+    '<g transform="translate(0,58)">' +
     flows + pole +
     svgBattery(240, 'Battery 1', PWR.bat1, pct1, !onGrid && !isBat2, 'standby · โซลาร์ชาร์จ') +
     svgBattery(400, 'Battery 2', PWR.bat2, pct2, !onGrid && isBat2, onGrid ? 'standby · โซลาร์ชาร์จ' : 'จ่าย D-STAR ต่อเนื่อง') +
-    station + dstar + '</svg>';
+    station + dstar +
+    '</g></svg>';
 }
 
 function renderPower(s, upd) {
