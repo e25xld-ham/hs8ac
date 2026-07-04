@@ -305,6 +305,24 @@
   .ustat .uv { font-size: 17px; font-weight: 800; color: #0d2654; }
   .ustat .us { font-size: 11px; color: #999; }
   .usage-sub { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 6px; }
+  .stackbar {
+    display: flex;
+    height: 22px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f0f4fb;
+    margin-bottom: 6px;
+  }
+  .stackbar div { min-width: 2px; }
+  .stack-legend {
+    display: flex; flex-wrap: wrap; gap: 4px 14px;
+    font-size: 11px; color: #666;
+  }
+  .stack-legend i {
+    display: inline-block;
+    width: 10px; height: 10px; border-radius: 3px;
+    margin-right: 4px; vertical-align: -1px;
+  }
   .heatmap {
     display: grid;
     grid-template-columns: 42px repeat(24, 1fr);
@@ -474,7 +492,10 @@
     <div class="lh-card" id="usageCard" style="display:none">
       <div class="lh-head">📊 ความหนาแน่นการใช้งานความถี่</div>
       <div class="usage-stats" id="usageStats"></div>
-      <div class="usage-sub">Hourly heatmap — last 7 days</div>
+      <div class="usage-sub">Keyups breakdown today <span style="font-weight:400;color:#999;">(kerchunk = key &lt; 3s)</span></div>
+      <div class="stackbar" id="stackBar"></div>
+      <div class="stack-legend" id="stackLegend"></div>
+      <div class="usage-sub" style="margin-top:14px;">Hourly heatmap — last 7 days</div>
       <div class="heatmap" id="heatmap"></div>
       <div class="heat-legend">
         <span>low</span>
@@ -551,6 +572,22 @@ function renderUsage(u) {
     '<div class="us">from ' + (t.uniq ?? 0) + ' stations</div></div>' +
     '<div class="ustat"><div class="ul">Peak hour</div><div class="uv">' + (t.peak_hour ?? '—') + '</div>' +
     '<div class="us">' + (t.peak_air ? fmtAir(t.peak_air) : 'no data yet') + '</div></div>';
+
+  const segs = [
+    { label: '\ud83d\udcfb RF talk', v: (t.rf_keys ?? 0) - (t.rf_kc ?? 0), color: '#0d447c' },
+    { label: '\ud83d\udcfb RF kerchunk', v: t.rf_kc ?? 0, color: '#85B7EB' },
+    { label: '\ud83c\udf10 AllStar talk', v: (t.asl_keys ?? 0) - (t.asl_kc ?? 0), color: '#16a34a' },
+    { label: '\ud83c\udf10 AllStar kerchunk', v: t.asl_kc ?? 0, color: '#86efac' }
+  ];
+  const segTotal = segs.reduce((a, s) => a + s.v, 0);
+  document.getElementById('stackBar').innerHTML = segTotal > 0 ? segs.filter(s => s.v > 0).map(s => {
+    const pct = Math.round(s.v / segTotal * 100);
+    return '<div style="width:' + (s.v / segTotal * 100) + '%;background:' + s.color +
+      '" title="' + s.label + ' \u2014 ' + s.v + ' keyups (' + pct + '%)"></div>';
+  }).join('') : '';
+  document.getElementById('stackLegend').innerHTML = segs.map(s =>
+    '<span><i style="background:' + s.color + '"></i>' + s.label + ' ' + s.v + '</span>'
+  ).join('');
 
   let hm = '<div></div>';
   for (let h = 0; h < 24; h++) hm += '<div class="hhour">' + (h % 6 === 0 ? h : '') + '</div>';
