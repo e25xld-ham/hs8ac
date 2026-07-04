@@ -728,12 +728,29 @@ function renderPower(s, upd) {
   const minFrac = nowTH.getMinutes() / 60;
   let analogUsed = 0, dutyNote = '';
   if (!onGrid) {
-    const startH = hr >= 17 ? 17 : 0;
-    let txSec = 0;
-    for (let h = startH; h <= hr && h < bars.length; h++) txSec += bars[h]?.air ?? 0;
-    const elapsed = (hr - startH) + minFrac;
+    let txSec = 0, elapsed = 0, startLabel = '';
+    if (hr >= 17) {
+      for (let h = 17; h <= hr && h < bars.length; h++) txSec += bars[h]?.air ?? 0;
+      elapsed = (hr - 17) + minFrac;
+      startLabel = '17:00 น.';
+    } else {
+      // หลังเที่ยงคืน: ถ้าเมื่อวานเป็นแบตก้อนเดียวกัน = จ่ายต่อเนื่องจาก 17:00 เมื่อวาน
+      // (เช่นคืนเสาร์→อาทิตย์ Battery 1 ติดกัน) ห้ามรีเซ็ตตัวนับ
+      const prevIsBat2 = [1, 3, 5].includes((dow + 6) % 7);
+      if (prevIsBat2 === isBat2 && heat.length > 1) {
+        const yvals = heat[heat.length - 2].vals || [];
+        for (let h = 17; h < 24; h++) txSec += yvals[h] ?? 0;
+        for (let h = 0; h <= hr && h < bars.length; h++) txSec += bars[h]?.air ?? 0;
+        elapsed = hr + 7 + minFrac;
+        startLabel = '17:00 น. เมื่อวาน';
+      } else {
+        for (let h = 0; h <= hr && h < bars.length; h++) txSec += bars[h]?.air ?? 0;
+        elapsed = hr + minFrac;
+        startLabel = 'เที่ยงคืน (สลับชุด)';
+      }
+    }
     analogUsed = baseA * elapsed + txA * txSec / 3600;
-    dutyNote = 'จ่ายไฟตั้งแต่ ' + String(startH).padStart(2, '0') + ':00 น.';
+    dutyNote = 'จ่ายไฟตั้งแต่ ' + startLabel;
   }
   const act1 = !onGrid && !isBat2, act2 = !onGrid && isBat2;
   const usable1 = PWR.bat1 * PWR.dod, usable2 = PWR.bat2 * PWR.dod;
