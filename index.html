@@ -1115,6 +1115,19 @@ function startLive(url) {
         talkBox.style.display = 'none';
       }
       if (L.lastheard && L.lastheard.length > 0) renderLH(L.lastheard);
+      if (L.links) {
+        const list = document.getElementById('connectedList');
+        if (L.links.length > 0) {
+          list.style.display = 'block';
+          list.innerHTML = 'เชื่อมต่ออยู่: ' +
+            L.links.map(n => '<span class="chip">' + n + '</span>').join('');
+        } else {
+          list.style.display = 'none';
+        }
+        const act = L.links.filter(n => n.endsWith('-P')).length;
+        document.getElementById('activeUsers').textContent = act;
+        document.getElementById('externalNodes').textContent = L.links.length - act;
+      }
     } catch (e) {
       pill.style.display = 'none';
       talkBox.style.display = 'none';
