@@ -617,7 +617,8 @@ const PWR = {
 
 function svgBattery(cx, name, ah, pct, active) {
   const p = Math.max(0, Math.min(100, Math.round(pct)));
-  const fill = p >= 50 ? '#22c55e' : p >= 20 ? '#f59e0b' : '#dc2626';
+  const fill = p >= 80 ? '#22c55e' : p >= 40 ? '#f59e0b' : '#dc2626';
+  const lowBlink = p < 40 ? '<animate attributeName="opacity" values="1;0.25;1" dur="0.9s" repeatCount="indefinite"/>' : '';
   const w = 110, x = cx - w / 2, y = 52, h = 40;
   let s = '';
   if (active) {
@@ -630,7 +631,7 @@ function svgBattery(cx, name, ah, pct, active) {
   s += '<text x="' + cx + '" y="46" text-anchor="middle" font-size="11" font-weight="800" fill="' + (active ? '#16a34a' : '#0d2654') + '">' + name + ' · ' + ah + 'Ah</text>' +
     '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="7" fill="#eef2fa" stroke="' + (active ? '#16a34a' : '#94a3b8') + '" stroke-width="3"/>' +
     '<rect x="' + (x + w) + '" y="' + (y + 12) + '" width="6" height="16" rx="2.5" fill="' + (active ? '#16a34a' : '#94a3b8') + '"/>' +
-    '<rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="' + ((w - 6) * p / 100) + '" height="' + (h - 6) + '" rx="5" fill="' + fill + '"/>' +
+    '<rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="' + ((w - 6) * p / 100) + '" height="' + (h - 6) + '" rx="5" fill="' + fill + '">' + lowBlink + '</rect>' +
     '<line x1="' + (x + w * 0.25) + '" y1="' + (y + 3) + '" x2="' + (x + w * 0.25) + '" y2="' + (y + h - 3) + '" stroke="rgba(13,38,84,0.18)" stroke-width="1.2"/>' +
     '<line x1="' + (x + w * 0.5) + '" y1="' + (y + 3) + '" x2="' + (x + w * 0.5) + '" y2="' + (y + h - 3) + '" stroke="rgba(13,38,84,0.18)" stroke-width="1.2"/>' +
     '<line x1="' + (x + w * 0.75) + '" y1="' + (y + 3) + '" x2="' + (x + w * 0.75) + '" y2="' + (y + h - 3) + '" stroke="rgba(13,38,84,0.18)" stroke-width="1.2"/>' +
