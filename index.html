@@ -254,26 +254,6 @@
     color: #92400e;
   }
 
-  .talking-now {
-    margin-top: 12px;
-    padding: 8px 12px;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 10px;
-    font-size: 13px;
-    color: #991b1b;
-    font-weight: 700;
-  }
-  .talking-now .chip {
-    display: inline-block;
-    background: #dc2626;
-    color: white;
-    font-family: monospace;
-    font-size: 13px;
-    padding: 2px 12px;
-    border-radius: 50px;
-    margin-left: 6px;
-  }
   .lh-card {
     border: 2px solid #e0e8ff;
     border-radius: 16px;
@@ -468,7 +448,6 @@
         </div>
       </div>
       <div class="connected-list" id="connectedList" style="display:none"></div>
-      <div class="talking-now" id="talkingNow" style="display:none"></div>
     </div>
 
     <div id="playerBox" style="display:none;margin-bottom:18px;text-align:center;"></div>
@@ -626,15 +605,6 @@ async function loadStatus() {
         s.connected_nodes.map(n => '<span class="chip">' + n + '</span>').join('');
     } else {
       list.style.display = 'none';
-    }
-
-    const talkBox = document.getElementById('talkingNow');
-    if (s.talking && s.talking.length > 0) {
-      talkBox.style.display = 'block';
-      talkBox.innerHTML = '🔴 กำลังพูดขณะนี้:' +
-        s.talking.map(n => '<span class="chip">' + n + '</span>').join('');
-    } else {
-      talkBox.style.display = 'none';
     }
 
     if (s.lastheard && s.lastheard.length > 0) {
