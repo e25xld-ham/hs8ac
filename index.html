@@ -761,6 +761,11 @@ function renderPower(s, upd) {
     const used2 = DSTAR_A * dsHours + (act2 ? analogUsed : 0);
     pct2 = 100 * Math.max(0, usable2 - used2) / usable2;
   }
+  // Battery 2: ถ้ามีแรงดันวัดจริงจาก MPPT ให้เทียบ % จากแรงดันแทนค่าประเมิน
+  // ตารางเทียบจากผู้ใช้: 13.8V = 100%, 13.1V = 61% (เส้นตรง, ~12.0V = 0%)
+  if (s.mppt && s.mppt.bat_v != null) {
+    pct2 = Math.max(0, Math.min(100, 61 + (s.mppt.bat_v - 13.1) * (39 / 0.7)));
+  }
   const isDay = hr >= 6 && hr < 18;
   const diagram = powerDiagram(onGrid, isBat2, pct1, pct2);
   const pb = document.getElementById('powerBody');
@@ -840,7 +845,7 @@ function renderPower(s, upd) {
     '<div class="ustat"><div class="ul">อัตรากินไฟขณะส่ง</div><div class="uv">' + txA + ' A</div><div class="us">' + PWR.txW + 'W @ ' + PWR.volt + 'V · ส่ง 1 นาที = ' + (txA / 60).toFixed(2) + ' Ah</div></div>' +
     '<div class="ustat"><div class="ul">TX เฉลี่ย/วัน (7 วัน)</div><div class="uv">' + fmtAir(txAvgSec) + '</div><div class="us">≈ ' + Math.round(dailyAh) + ' Ah/วัน รวมสแตนด์บาย</div></div>' +
     '</div>' +
-    '<div style="font-size:10px;color:#999;margin-top:8px;">* ค่าสมมติ: สแตนด์บาย ' + PWR.standbyA + 'A · ลิเธียมดึงไฟได้ ' + Math.round(PWR.dod * 100) + '% ของความจุ · D-STAR หัก 5 Ah/ชม. จาก Battery 2 (นับเฉพาะช่วงนอกโซลาร์ชาร์จ) · % แบตเป็นค่าประเมิน (แรงดัน Battery 2 เป็นค่าวัดจริงจาก MPPT)</div>';
+    '<div style="font-size:10px;color:#999;margin-top:8px;">* ค่าสมมติ: สแตนด์บาย ' + PWR.standbyA + 'A · ลิเธียมดึงไฟได้ ' + Math.round(PWR.dod * 100) + '% ของความจุ · D-STAR หัก 5 Ah/ชม. จาก Battery 2 (นับเฉพาะช่วงนอกโซลาร์ชาร์จ) · Battery 2 % คำนวณจากแรงดันวัดจริง (13.8V=100% · 13.1V=61%) · Battery 1 % เป็นค่าประเมิน</div>';
 
   if (upd) document.getElementById('powerUpdated').textContent = 'Last updated ' + upd;
 }
