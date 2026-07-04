@@ -499,7 +499,7 @@
     </div>
 
     <div class="lh-card" id="usageCard" style="display:none">
-      <div class="lh-head">📊 ความหนาแน่นการใช้งานความถี่</div>
+      <div class="lh-head">📊 ความหนาแน่นการใช้งานความถี่ <span class="lh-keyups" id="usageUpdated"></span></div>
       <div class="usage-stats" id="usageStats"></div>
       <div class="usage-sub">Keyups breakdown today <span style="font-weight:400;color:#999;">(kerchunk = key &lt; 3s)</span></div>
       <div class="stackbar" id="stackBar"></div>
@@ -645,7 +645,7 @@ async function loadStatus() {
     if (s.online) {
       dot.classList.remove('off');
       title.textContent = 'Node ' + s.node + ' ออนไลน์';
-      sub.textContent = s.uptime ? ('อัพไทม์ ' + s.uptime) : 'ระบบทำงานปกติ';
+      sub.textContent = (s.uptime ? ('อัพไทม์ ' + s.uptime) : 'ระบบทำงานปกติ');
     } else {
       dot.classList.add('off');
       title.textContent = 'Node ' + s.node + ' ออฟไลน์';
@@ -685,13 +685,27 @@ async function loadStatus() {
       }
       const kt = s.usage?.today?.keys ?? s.keyups_today;
       if (kt != null) {
-        document.getElementById('keyupsToday').textContent = kt + ' keyups today';
+        document.getElementById('keyupsToday').textContent =
+          kt + ' keyups today' + (upd ? ' \u00b7 updated ' + upd : '');
       }
+    }
+
+    let upd = '';
+    if (s.updated) {
+      const d = new Date(s.updated);
+      const p = n => String(n).padStart(2, '0');
+      upd = p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
     }
 
     if (s.usage) {
       document.getElementById('usageCard').style.display = 'block';
       renderUsage(s.usage);
+      if (upd) document.getElementById('usageUpdated').textContent = 'Last updated ' + upd;
+    }
+
+    if (upd) {
+      const subEl = document.getElementById('statusSub');
+      if (!subEl.textContent.includes('updated')) subEl.textContent += ' \u00b7 updated ' + upd;
     }
 
     if (s.updated_display) {
