@@ -505,6 +505,7 @@
       <div class="usage-sub" style="margin-top:14px;">Airtime per hour — today (00:00–23:59)</div>
       <div class="bars" id="usageBars"></div>
       <div class="bars-x" id="usageBarsX"></div>
+      <div class="stack-legend" id="barsLegend" style="margin-top:5px;"></div>
     </div>
 
     <div class="lh-card" id="lhCard" style="display:none">
@@ -601,12 +602,24 @@ function renderUsage(u) {
 
   const bars = u.bars || [];
   const maxAir = Math.max(60, ...bars.map(b => b.air));
-  document.getElementById('usageBars').innerHTML = bars.map(b =>
-    '<div style="height:' + Math.max(3, Math.round(b.air / maxAir * 100)) + '%;background:' +
-    (b.air / maxAir > 0.5 ? '#185FA5' : '#85B7EB') +
-    '" title="' + b.h + ':00 — ' + fmtAir(b.air) + ' (' + b.keys + ' keyups)"></div>').join('');
+  document.getElementById('usageBars').innerHTML = bars.map(b => {
+    const rf = b.rf ?? 0, asl = Math.max(0, b.air - rf);
+    const h = Math.max(3, Math.round(b.air / maxAir * 100));
+    const tip = b.h + ':00 \u2014 ' + fmtAir(b.air) +
+      ' (\ud83d\udcfb RF ' + fmtAir(rf) + ' \u00b7 \ud83c\udf10 AllStar ' + fmtAir(asl) +
+      ' \u00b7 ' + b.keys + ' keyups)';
+    let inner = '';
+    if (b.air > 0) {
+      if (asl > 0) inner += '<div style="height:' + Math.round(asl / b.air * 100) + '%;background:#16a34a;"></div>';
+      if (rf > 0) inner += '<div style="flex:1;background:#185FA5;"></div>';
+    }
+    return '<div style="height:' + h + '%;display:flex;flex-direction:column;background:#dbe8f9;" title="' + tip + '">' + inner + '</div>';
+  }).join('');
   document.getElementById('usageBarsX').innerHTML = bars.map((b, i) =>
     '<span>' + (i % 4 === 0 ? b.h : '') + '</span>').join('');
+  document.getElementById('barsLegend').innerHTML =
+    '<span><i style="background:#185FA5"></i>\ud83d\udcfb RF</span>' +
+    '<span><i style="background:#16a34a"></i>\ud83c\udf10 AllStar</span>';
 }
 
 async function loadStatus() {
