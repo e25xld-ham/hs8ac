@@ -501,7 +501,7 @@
       <div class="bars" id="usageBars"></div>
       <div class="bars-x" id="usageBarsX"></div>
       <div class="stack-legend" id="barsLegend" style="margin-top:5px;"></div>
-      <div class="usage-sub" style="margin-top:14px;">Daily airtime — last 30 days</div>
+      <div class="usage-sub" style="margin-top:14px;">Daily airtime (min) — last 30 days</div>
       <div class="bars" id="dayBars"></div>
       <div class="bars-x" id="dayBarsX"></div>
       <div class="stack-legend" id="dayLegend" style="margin-top:5px;"></div>
@@ -867,8 +867,9 @@ function renderPower(s, upd) {
       const col = d.b2 ? '#185FA5' : '#16a34a';
       const tip = d.d + ' \u2014 ' + ah.toFixed(1) + ' Ah \u00b7 TX ' + fmtAir(d.air) +
         ' \u00b7 \u0e40\u0e27\u0e23\u0e04\u0e37\u0e19: ' + (d.b2 ? 'Battery 2' : 'Battery 1');
-      return '<div class="bar-col" title="' + tip + '"><div class="bar-fill" style="height:' +
-        Math.max(3, Math.round(ah / maxDAh * 96)) + '%;background:' + col + ';"></div></div>';
+      const label = d.air > 0 ? '<div class="bar-val">' + Math.round(ah) + '</div>' : '';
+      return '<div class="bar-col" title="' + tip + '">' + label + '<div class="bar-fill" style="height:' +
+        Math.max(3, Math.round(ah / maxDAh * 88)) + '%;background:' + col + ';"></div></div>';
     }).join('');
     document.getElementById('powerDayBarsX').innerHTML = days.map((d, i) =>
       '<span>' + (i % 5 === 0 ? d.d : '') + '</span>').join('');
@@ -948,7 +949,7 @@ function renderUsage(u) {
     const maxDA = Math.max(60, ...days.map(d => d.air));
     document.getElementById('dayBars').innerHTML = days.map(d => {
       const asl = Math.max(0, d.air - d.rf);
-      const h = Math.max(2, Math.round(d.air / maxDA * 96));
+      const h = Math.max(2, Math.round(d.air / maxDA * 88));
       const tip = d.d + ' \u2014 ' + fmtAir(d.air) + ' (\ud83d\udcfb RF ' + fmtAir(d.rf) +
         ' \u00b7 \ud83c\udf10 AllStar ' + fmtAir(asl) + ' \u00b7 ' + d.keys + ' keyups)';
       let inner = '';
@@ -956,7 +957,12 @@ function renderUsage(u) {
         if (asl > 0) inner += '<div style="height:' + Math.round(asl / d.air * 100) + '%;background:#16a34a;"></div>';
         if (d.rf > 0) inner += '<div style="flex:1;background:#185FA5;"></div>';
       }
-      return '<div class="bar-col" title="' + tip + '"><div class="bar-fill" style="height:' + h + '%;background:#f0f4fb;">' + inner + '</div></div>';
+      let label = '';
+      if (d.air > 0) {
+        const m = Math.round(d.air / 60);
+        label = '<div class="bar-val">' + (m >= 1 ? m : '<1') + '</div>';
+      }
+      return '<div class="bar-col" title="' + tip + '">' + label + '<div class="bar-fill" style="height:' + h + '%;background:#f0f4fb;">' + inner + '</div></div>';
     }).join('');
     document.getElementById('dayBarsX').innerHTML = days.map((d, i) =>
       '<span>' + (i % 5 === 0 ? d.d : '') + '</span>').join('');
