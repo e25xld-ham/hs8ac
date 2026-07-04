@@ -191,6 +191,9 @@
     gap: 2px 12px;
     font-size: 15px; font-weight: 700; color: #0d2654;
     margin: 4px 0 12px;
+    padding: 12px 2px 0;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--s1, #1a4a9e), var(--s2, #FFD700) 55%, rgba(255,255,255,0)) top left / 100% 5px no-repeat;
   }
   .services {
     display: grid;
@@ -407,7 +410,7 @@
   <div class="panel">
 
     <!-- Services -->
-    <div class="section-title">🛎️ บริการสมาชิก</div>
+    <div class="section-title" style="--s1:#06c755;--s2:#6ee7a8;">🛎️ บริการสมาชิก</div>
     <div class="services">
       <a class="service line-card featured" href="https://lin.ee/UcqTYjEo" target="_blank">
         <div class="feat-badge">⭐ บริการยอดนิยม</div>
@@ -431,7 +434,7 @@
     </div>
 
     <!-- About -->
-    <div class="section-title" style="margin-top:18px;">🏛️ ข้อมูลสมาคม</div>
+    <div class="section-title" style="margin-top:18px;--s1:#f59e0b;--s2:#FFD700;">🏛️ ข้อมูลสมาคม</div>
     <div class="services">
       <div class="service expand" onclick="toggleCard(this)">
         <div class="icon">📜</div>
@@ -480,7 +483,7 @@
 
 
     <!-- Node status -->
-    <div class="section-title" style="margin-top:18px;">📶 สถานะระบบ AllStarLink</div>
+    <div class="section-title" style="margin-top:18px;--s1:#1a4a9e;--s2:#60a5fa;">📶 สถานะระบบ AllStarLink</div>
     <div class="status-card">
       <div class="status-row">
         <div class="status-left">
@@ -521,7 +524,7 @@
     </div>
 
     <div id="usageSection" style="display:none">
-    <div class="section-title" style="margin-top:18px;">📊 On-Air Activity <span class="lh-keyups" id="usageUpdated"></span></div>
+    <div class="section-title" style="margin-top:18px;--s1:#7c3aed;--s2:#c084fc;">📊 On-Air Activity <span class="lh-keyups" id="usageUpdated"></span></div>
     <div class="lh-card">
       <div class="usage-stats" id="usageStats"></div>
       <div class="usage-sub">Keyups breakdown today <span style="font-weight:400;color:#999;">(kerchunk = key &lt; 3s)</span></div>
@@ -541,7 +544,7 @@
     </div>
     </div>
 
-    <div class="section-title" style="margin-top:18px;">⚡ Power &amp; Emergency Planning <span class="lh-keyups" id="powerUpdated"></span></div>
+    <div class="section-title" style="margin-top:18px;--s1:#ea580c;--s2:#fbbf24;">⚡ Power &amp; Emergency Planning <span class="lh-keyups" id="powerUpdated"></span></div>
     <div class="lh-card" id="powerBody"><div style="font-size:12px;color:#999;">กำลังคำนวณ...</div></div>
 
     <div class="lh-card" id="lhCard" style="display:none">
