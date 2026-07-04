@@ -280,6 +280,15 @@
     flex: 1;
   }
   .lh-time { color: #888; }
+  .lh-last {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #e0e8ff;
+    font-size: 12px;
+    color: #666;
+    display: flex; flex-wrap: wrap; gap: 4px 18px;
+  }
+  .lh-last b { font-family: monospace; color: #0d2654; }
   .lh-dur {
     background: #eff6ff; color: #1a4a9e;
     font-size: 12px; font-weight: 700;
@@ -511,6 +520,7 @@
     <div class="lh-card" id="lhCard" style="display:none">
       <div class="lh-head">🎧 ใช้งานล่าสุด (Last Heard) <span class="lh-keyups" id="keyupsToday"></span></div>
       <div id="lhList"></div>
+      <div class="lh-last" id="lhLast" style="display:none"></div>
     </div>
 
     <div class="updated" id="updated"></div>
@@ -664,6 +674,15 @@ async function loadStatus() {
         '<span class="lh-time">' + e.hm + '</span>' +
         '<span class="lh-dur">' + fmtDur(e.d) + '</span></div>'
       ).join('');
+      const la = s.last_activity || {};
+      const parts = [];
+      if (la.asl) parts.push('\ud83c\udf10 Last AllStar: <b>' + la.asl.c + '</b> ' + la.asl.hm);
+      if (la.rf) parts.push('\ud83d\udcfb Last RF: <b>' + la.rf.c + '</b> ' + la.rf.hm);
+      const lhLast = document.getElementById('lhLast');
+      if (parts.length > 0) {
+        lhLast.style.display = 'flex';
+        lhLast.innerHTML = parts.map(p => '<span>' + p + '</span>').join('');
+      }
       const kt = s.usage?.today?.keys ?? s.keyups_today;
       if (kt != null) {
         document.getElementById('keyupsToday').textContent = kt + ' keyups today';
