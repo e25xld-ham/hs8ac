@@ -479,14 +479,14 @@
     <div class="lh-card" id="usageCard" style="display:none">
       <div class="lh-head">📊 ความหนาแน่นการใช้งานความถี่</div>
       <div class="usage-stats" id="usageStats"></div>
-      <div class="usage-sub">Heatmap รายชั่วโมง — 7 วันล่าสุด</div>
+      <div class="usage-sub">Hourly heatmap — last 7 days</div>
       <div class="heatmap" id="heatmap"></div>
       <div class="heat-legend">
-        <span>เบา</span>
+        <span>low</span>
         <i style="background:#f0f4fb"></i><i style="background:#dbe8f9"></i><i style="background:#a9cbf0"></i><i style="background:#64a1e0"></i><i style="background:#2d74c4"></i><i style="background:#0d447c"></i>
-        <span>หนาแน่น</span>
+        <span>busy</span>
       </div>
-      <div class="usage-sub" style="margin-top:14px;">Airtime ต่อชั่วโมง — วันนี้ (00:00–23:59 น.)</div>
+      <div class="usage-sub" style="margin-top:14px;">Airtime per hour — today (00:00–23:59)</div>
       <div class="bars" id="usageBars"></div>
       <div class="bars-x" id="usageBarsX"></div>
     </div>
@@ -523,14 +523,14 @@ if (BROADCASTIFY_KEY) {
 }
 
 function fmtDur(d) {
-  if (d < 60) return d + ' วิ';
-  return Math.floor(d / 60) + ' นาที ' + (d % 60) + ' วิ';
+  if (d < 60) return d + 's';
+  return Math.floor(d / 60) + 'm ' + (d % 60) + 's';
 }
 
 function fmtAir(s) {
-  if (s < 60) return s + ' วินาที';
-  if (s < 3600) return Math.round(s / 60) + ' นาที';
-  return (s / 3600).toFixed(1) + ' ชม.';
+  if (s < 60) return s + ' sec';
+  if (s < 3600) return Math.round(s / 60) + ' min';
+  return (s / 3600).toFixed(1) + ' hr';
 }
 
 function heatColor(s) {
@@ -545,12 +545,12 @@ function heatColor(s) {
 function renderUsage(u) {
   const t = u.today || {};
   document.getElementById('usageStats').innerHTML =
-    '<div class="ustat"><div class="ul">กดคีย์วันนี้</div><div class="uv">' + (t.keys ?? 0) + ' ครั้ง</div>' +
+    '<div class="ustat"><div class="ul">Keyups today</div><div class="uv">' + (t.keys ?? 0) + '</div>' +
     '<div class="us">📻 RF ' + (t.rf_keys ?? 0) + ' · 🌐 AllStar ' + (t.asl_keys ?? 0) + '</div></div>' +
-    '<div class="ustat"><div class="ul">Airtime วันนี้</div><div class="uv">' + fmtAir(t.air ?? 0) + '</div>' +
-    '<div class="us">จาก ' + (t.uniq ?? 0) + ' สถานี</div></div>' +
-    '<div class="ustat"><div class="ul">ชั่วโมงพีค</div><div class="uv">' + (t.peak_hour ?? '—') + '</div>' +
-    '<div class="us">' + (t.peak_air ? fmtAir(t.peak_air) : 'ยังไม่มีข้อมูล') + '</div></div>';
+    '<div class="ustat"><div class="ul">Airtime today</div><div class="uv">' + fmtAir(t.air ?? 0) + '</div>' +
+    '<div class="us">from ' + (t.uniq ?? 0) + ' stations</div></div>' +
+    '<div class="ustat"><div class="ul">Peak hour</div><div class="uv">' + (t.peak_hour ?? '—') + '</div>' +
+    '<div class="us">' + (t.peak_air ? fmtAir(t.peak_air) : 'no data yet') + '</div></div>';
 
   let hm = '<div></div>';
   for (let h = 0; h < 24; h++) hm += '<div class="hhour">' + (h % 6 === 0 ? h : '') + '</div>';
@@ -567,7 +567,7 @@ function renderUsage(u) {
   document.getElementById('usageBars').innerHTML = bars.map(b =>
     '<div style="height:' + Math.max(3, Math.round(b.air / maxAir * 100)) + '%;background:' +
     (b.air / maxAir > 0.5 ? '#185FA5' : '#85B7EB') +
-    '" title="' + b.h + ':00 — ' + fmtAir(b.air) + ' (' + b.keys + ' คีย์)"></div>').join('');
+    '" title="' + b.h + ':00 — ' + fmtAir(b.air) + ' (' + b.keys + ' keyups)"></div>').join('');
   document.getElementById('usageBarsX').innerHTML = bars.map((b, i) =>
     '<span>' + (i % 4 === 0 ? b.h : '') + '</span>').join('');
 }
@@ -616,7 +616,7 @@ async function loadStatus() {
       ).join('');
       const kt = s.usage?.today?.keys ?? s.keyups_today;
       if (kt != null) {
-        document.getElementById('keyupsToday').textContent = 'วันนี้กดคีย์ ' + kt + ' ครั้ง';
+        document.getElementById('keyupsToday').textContent = kt + ' keyups today';
       }
     }
 
