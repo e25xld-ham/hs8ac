@@ -584,7 +584,8 @@ function fmtDur(d) {
 function fmtAir(s) {
   if (s < 60) return s + ' sec';
   if (s < 3600) return Math.round(s / 60) + ' min';
-  return (s / 3600).toFixed(1) + ' hr';
+  const hr = Math.floor(s / 3600), mn = Math.round((s % 3600) / 60);
+  return mn > 0 ? hr + ' hr ' + mn + ' min' : hr + ' hr';
 }
 
 function heatColor(s) {
