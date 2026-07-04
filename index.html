@@ -260,6 +260,41 @@
     color: #92400e;
   }
 
+  .conn-console {
+    margin-top: 12px;
+    background: linear-gradient(180deg, #0c1c38, #12264a);
+    border: 1px solid #274b85;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-family: monospace;
+  }
+  .conn-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    color: #6f95cf; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; margin-bottom: 8px;
+  }
+  .conn-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 9px; border-radius: 8px;
+    font-size: 12.5px; color: #dbe8f9;
+    border: 1px solid transparent;
+  }
+  .conn-row.talking {
+    background: rgba(22,163,74,0.22);
+    border-color: #16a34a;
+  }
+  .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #35558c; flex: none; }
+  .conn-row.talking .conn-dot { background: #22c55e; animation: livepulse 1s ease-in-out infinite; }
+  .conn-name { font-weight: 700; color: #ffffff; white-space: nowrap; }
+  .conn-info { flex: 1; min-width: 60px; color: #8fa8cc; font-size: 11px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .conn-ct { color: #6f95cf; font-size: 11px; white-space: nowrap; }
+  .conn-badge {
+    font-size: 9px; font-weight: 700; padding: 1.5px 7px; border-radius: 4px;
+    background: #1e3a6e; color: #93c5fd; white-space: nowrap;
+  }
+  .conn-badge.tx { background: #14532d; color: #86efac; }
+
   .talking-now {
     margin-top: 12px;
     padding: 8px 12px;
@@ -559,8 +594,7 @@
           <a class="btn btn-stats" href="https://stats.allstarlink.org/stats/620540" target="_blank">📊 สถิติ Node</a>
         </div>
       </div>
-      <div class="connected-list" id="connectedList" style="display:none"></div>
-      <div class="talking-now" id="talkingNow" style="display:none"></div>
+      <div class="conn-console" id="connConsole" style="display:none"></div>
     </div>
 
     <div id="playerBox" style="display:none;margin-bottom:18px;text-align:center;"></div>
@@ -1040,13 +1074,10 @@ async function loadStatus() {
     document.getElementById('activeUsers').textContent = active;
     document.getElementById('externalNodes').textContent = external;
 
-    const list = document.getElementById('connectedList');
-    if (s.connected_nodes && s.connected_nodes.length > 0) {
-      list.style.display = 'block';
-      list.innerHTML = 'เชื่อมต่ออยู่: ' +
-        s.connected_nodes.map(n => '<span class="chip">' + n + '</span>').join('');
-    } else {
-      list.style.display = 'none';
+    if (!liveOk) {
+      renderConsole((s.connected_nodes || []).map(n => ({ n: n, k: false, m: '', dir: '', ct: '',
+        i: n.endsWith('-P') ? 'สมาชิก · DVSwitch' : '' })),
+        (s.talking || []).includes('RF'));
     }
 
     if (s.lastheard && s.lastheard.length > 0) {
@@ -1093,44 +1124,56 @@ function renderLH(entries) {
   ).join('');
 }
 
+function renderConsole(links, rfActive) {
+  const box = document.getElementById('connConsole');
+  box.style.display = 'block';
+  const modeName = m => m === 'T' ? 'TRX' : m === 'R' ? 'RX' : m === 'C' ? 'CONN' : '';
+  let rows =
+    '<div class="conn-row' + (rfActive ? ' talking' : '') + '">' +
+    '<div class="conn-dot"></div>' +
+    '<span class="conn-name">620540</span>' +
+    '<span class="conn-info">HS8AC · E24BK 145.700 MHz</span>' +
+    (rfActive ? '<span class="conn-badge tx">● COS · RF</span>' : '<span class="conn-badge">LOCAL</span>') +
+    '</div>';
+  rows += links.map(l =>
+    '<div class="conn-row' + (l.k ? ' talking' : '') + '">' +
+    '<div class="conn-dot"></div>' +
+    '<span class="conn-name">' + l.n + '</span>' +
+    '<span class="conn-info">' + (l.i || '') + '</span>' +
+    (l.ct ? '<span class="conn-ct">' + l.ct + '</span>' : '') +
+    (l.dir ? '<span class="conn-badge">' + l.dir + '</span>' : '') +
+    (l.k ? '<span class="conn-badge tx">● TX</span>' : (l.m ? '<span class="conn-badge">' + modeName(l.m) + '</span>' : '')) +
+    '</div>'
+  ).join('');
+  box.innerHTML =
+    '<div class="conn-head"><span>▮▮ CONNECTION STATUS</span><span>' +
+    links.length + ' NODE' + (links.length === 1 ? '' : 'S') + ' CONNECTED</span></div>' + rows;
+}
+
 // ---- Realtime ผ่าน Cloudflare Tunnel ----
-let liveTimer = null, liveUrl = null;
+let liveTimer = null, liveUrl = null, liveOk = false;
 function startLive(url) {
   if (url === liveUrl) return;
   liveUrl = url;
   if (liveTimer) clearInterval(liveTimer);
   const pill = document.getElementById('livePill');
-  const talkBox = document.getElementById('talkingNow');
   const poll = async () => {
     try {
       const r = await fetch(liveUrl + '/live', { cache: 'no-store' });
       if (!r.ok) throw new Error();
       const L = await r.json();
+      liveOk = true;
       pill.style.display = 'inline-block';
-      if (L.talking && L.talking.length > 0) {
-        talkBox.style.display = 'block';
-        talkBox.innerHTML = '🔴 กำลังพูดขณะนี้:' +
-          L.talking.map(n => '<span class="chip">' + (n === 'RF' ? '📻 RF' : n) + '</span>').join('');
-      } else {
-        talkBox.style.display = 'none';
-      }
       if (L.lastheard && L.lastheard.length > 0) renderLH(L.lastheard);
       if (L.links) {
-        const list = document.getElementById('connectedList');
-        if (L.links.length > 0) {
-          list.style.display = 'block';
-          list.innerHTML = 'เชื่อมต่ออยู่: ' +
-            L.links.map(n => '<span class="chip">' + n + '</span>').join('');
-        } else {
-          list.style.display = 'none';
-        }
-        const act = L.links.filter(n => n.endsWith('-P')).length;
+        renderConsole(L.links, !!L.rf);
+        const act = L.links.filter(l => l.n.endsWith('-P')).length;
         document.getElementById('activeUsers').textContent = act;
         document.getElementById('externalNodes').textContent = L.links.length - act;
       }
     } catch (e) {
+      liveOk = false;
       pill.style.display = 'none';
-      talkBox.style.display = 'none';
     }
   };
   poll();
