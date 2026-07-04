@@ -501,6 +501,10 @@
       <div class="bars" id="usageBars"></div>
       <div class="bars-x" id="usageBarsX"></div>
       <div class="stack-legend" id="barsLegend" style="margin-top:5px;"></div>
+      <div class="usage-sub" style="margin-top:14px;">Daily airtime — last 30 days</div>
+      <div class="bars" id="dayBars"></div>
+      <div class="bars-x" id="dayBarsX"></div>
+      <div class="stack-legend" id="dayLegend" style="margin-top:5px;"></div>
     </div>
     </div>
 
@@ -836,6 +840,10 @@ function renderPower(s, upd) {
     '<div class="usage-sub">Power consumption per hour (Ah) — today · <span style="color:#16a34a;">■</span> จากแบต <span style="color:#f59e0b;">■</span> จากไฟ 220V · แท่งไม่มีเลข = standby ' + baseA.toFixed(1) + ' Ah</div>' +
     '<div class="bars">' + consHtml + '</div>' +
     '<div class="bars-x">' + consX + '</div>' +
+    '<div class="usage-sub" style="margin-top:12px;">Daily consumption (Ah) — last 30 days \u00b7 \u0e2a\u0e35\u0e15\u0e32\u0e21\u0e41\u0e1a\u0e15\u0e40\u0e27\u0e23\u0e04\u0e37\u0e19\u0e19\u0e31\u0e49\u0e19</div>' +
+    '<div class="bars" id="powerDayBars"></div>' +
+    '<div class="bars-x" id="powerDayBarsX"></div>' +
+    '<div class="stack-legend" id="powerDayLegend" style="margin-top:5px;"></div>' +
     '<div class="usage-stats" style="margin-top:12px;">' +
     (s.mppt && s.mppt.bat_v != null ?
       '<div class="ustat" style="background:#f0fdf4;border-color:#86efac;"><div class="ul" style="color:#166534;">📡 Battery 2 — ค่าวัดจริงจาก MPPT</div>' +
@@ -846,6 +854,25 @@ function renderPower(s, upd) {
     '<div class="ustat"><div class="ul">TX เฉลี่ย/วัน (7 วัน)</div><div class="uv">' + fmtAir(txAvgSec) + '</div><div class="us">≈ ' + Math.round(dailyAh) + ' Ah/วัน รวมสแตนด์บาย</div></div>' +
     '</div>' +
     '<div style="font-size:10px;color:#999;margin-top:8px;">* ค่าสมมติ: สแตนด์บาย ' + PWR.standbyA + 'A · ลิเธียมดึงไฟได้ ' + Math.round(PWR.dod * 100) + '% ของความจุ · Battery 2 % คำนวณจากแรงดันวัดจริง (13.8V=100% · 13.1V=61%) · Battery 1 % เป็นค่าประเมิน</div>';
+
+  const days = s.usage?.days || [];
+  if (days.length > 0) {
+    const dayAh = days.map(d => baseA * 24 + txA * d.air / 3600);
+    const maxDAh = Math.max(baseA * 30, ...dayAh);
+    document.getElementById('powerDayBars').innerHTML = days.map((d, i) => {
+      const ah = dayAh[i];
+      const col = d.b2 ? '#185FA5' : '#16a34a';
+      const tip = d.d + ' \u2014 ' + ah.toFixed(1) + ' Ah \u00b7 TX ' + fmtAir(d.air) +
+        ' \u00b7 \u0e40\u0e27\u0e23\u0e04\u0e37\u0e19: ' + (d.b2 ? 'Battery 2' : 'Battery 1');
+      return '<div class="bar-col" title="' + tip + '"><div class="bar-fill" style="height:' +
+        Math.max(3, Math.round(ah / maxDAh * 96)) + '%;background:' + col + ';"></div></div>';
+    }).join('');
+    document.getElementById('powerDayBarsX').innerHTML = days.map((d, i) =>
+      '<span>' + (i % 5 === 0 ? d.d : '') + '</span>').join('');
+    document.getElementById('powerDayLegend').innerHTML =
+      '<span><i style="background:#16a34a"></i>\u0e04\u0e37\u0e19 Battery 1</span>' +
+      '<span><i style="background:#185FA5"></i>\u0e04\u0e37\u0e19 Battery 2</span>';
+  }
 
   if (upd) document.getElementById('powerUpdated').textContent = 'Last updated ' + upd;
 }
@@ -912,6 +939,31 @@ function renderUsage(u) {
   document.getElementById('barsLegend').innerHTML =
     '<span><i style="background:#185FA5"></i>\ud83d\udcfb RF</span>' +
     '<span><i style="background:#16a34a"></i>\ud83c\udf10 AllStar</span>';
+
+  const days = u.days || [];
+  if (days.length > 0) {
+    const maxDA = Math.max(60, ...days.map(d => d.air));
+    document.getElementById('dayBars').innerHTML = days.map(d => {
+      const asl = Math.max(0, d.air - d.rf);
+      const h = Math.max(2, Math.round(d.air / maxDA * 96));
+      const tip = d.d + ' \u2014 ' + fmtAir(d.air) + ' (\ud83d\udcfb RF ' + fmtAir(d.rf) +
+        ' \u00b7 \ud83c\udf10 AllStar ' + fmtAir(asl) + ' \u00b7 ' + d.keys + ' keyups)';
+      let inner = '';
+      if (d.air > 0) {
+        if (asl > 0) inner += '<div style="height:' + Math.round(asl / d.air * 100) + '%;background:#16a34a;"></div>';
+        if (d.rf > 0) inner += '<div style="flex:1;background:#185FA5;"></div>';
+      }
+      return '<div class="bar-col" title="' + tip + '"><div class="bar-fill" style="height:' + h + '%;background:#f0f4fb;">' + inner + '</div></div>';
+    }).join('');
+    document.getElementById('dayBarsX').innerHTML = days.map((d, i) =>
+      '<span>' + (i % 5 === 0 ? d.d : '') + '</span>').join('');
+    const totD = days.reduce((a, d) => a + d.air, 0);
+    const peakD = days.reduce((a, d) => d.air > a.air ? d : a, days[0]);
+    document.getElementById('dayLegend').innerHTML =
+      '<span><i style="background:#185FA5"></i>\ud83d\udcfb RF</span>' +
+      '<span><i style="background:#16a34a"></i>\ud83c\udf10 AllStar</span>' +
+      '<span style="margin-left:auto;color:#888;">\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22 ' + fmtAir(Math.round(totD / days.length)) + '/\u0e27\u0e31\u0e19 \u00b7 \u0e2a\u0e39\u0e07\u0e2a\u0e38\u0e14 ' + peakD.d + ' (' + fmtAir(peakD.air) + ')</span>';
+  }
 }
 
 async function loadStatus() {
