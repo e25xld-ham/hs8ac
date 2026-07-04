@@ -617,7 +617,7 @@ const PWR = {
   bat2: 400        // Battery 2 (Ah) ทำงาน จ. พ. ศ.
 };
 
-function svgBattery(cx, name, ah, pct, active, note) {
+function svgBattery(cx, name, ah, pct, active, charging, note) {
   const p = Math.max(0, Math.min(100, Math.round(pct)));
   const fill = p >= 80 ? '#22c55e' : p >= 40 ? '#f59e0b' : '#dc2626';
   const lowBlink = p < 40 ? '<animate attributeName="opacity" values="1;0.25;1" dur="0.9s" repeatCount="indefinite"/>' : '';
@@ -627,12 +627,16 @@ function svgBattery(cx, name, ah, pct, active, note) {
     s += '<g><animate attributeName="opacity" values="1;0.2;1" dur="1.3s" repeatCount="indefinite"/>' +
          '<rect x="' + (cx - 34) + '" y="16" width="68" height="19" rx="9.5" fill="#16a34a"/>' +
          '<text x="' + cx + '" y="29.5" text-anchor="middle" font-size="10" font-weight="800" fill="#ffffff">ACTIVE</text></g>';
+  } else if (charging) {
+    s += '<g><animate attributeName="opacity" values="1;0.2;1" dur="1.3s" repeatCount="indefinite"/>' +
+         '<rect x="' + (cx - 40) + '" y="16" width="80" height="19" rx="9.5" fill="#f59e0b"/>' +
+         '<text x="' + cx + '" y="29.5" text-anchor="middle" font-size="10" font-weight="800" fill="#ffffff">⚡ CHARGING</text></g>';
   } else {
-    s += '<text x="' + cx + '" y="29" text-anchor="middle" font-size="9.5" font-weight="600" fill="#94a3b8">' + (note || 'standby · โซลาร์ชาร์จ') + '</text>';
+    s += '<text x="' + cx + '" y="29" text-anchor="middle" font-size="9.5" font-weight="600" fill="#94a3b8">' + (note || 'standby') + '</text>';
   }
-  s += '<text x="' + cx + '" y="46" text-anchor="middle" font-size="11" font-weight="800" fill="' + (active ? '#16a34a' : '#0d2654') + '">' + name + ' · ' + ah + 'Ah</text>' +
-    '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="7" fill="#eef2fa" stroke="' + (active ? '#16a34a' : '#94a3b8') + '" stroke-width="3"/>' +
-    '<rect x="' + (x + w) + '" y="' + (y + 12) + '" width="6" height="16" rx="2.5" fill="' + (active ? '#16a34a' : '#94a3b8') + '"/>' +
+  s += '<text x="' + cx + '" y="46" text-anchor="middle" font-size="11" font-weight="800" fill="' + (active ? '#16a34a' : charging ? '#b45309' : '#0d2654') + '">' + name + ' · ' + ah + 'Ah</text>' +
+    '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="7" fill="#eef2fa" stroke="' + (active ? '#16a34a' : charging ? '#f59e0b' : '#94a3b8') + '" stroke-width="3"/>' +
+    '<rect x="' + (x + w) + '" y="' + (y + 12) + '" width="6" height="16" rx="2.5" fill="' + (active ? '#16a34a' : charging ? '#f59e0b' : '#94a3b8') + '"/>' +
     '<rect x="' + (x + 3) + '" y="' + (y + 3) + '" width="' + ((w - 6) * p / 100) + '" height="' + (h - 6) + '" rx="5" fill="' + fill + '">' + lowBlink + '</rect>' +
     '<line x1="' + (x + w * 0.25) + '" y1="' + (y + 3) + '" x2="' + (x + w * 0.25) + '" y2="' + (y + h - 3) + '" stroke="rgba(13,38,84,0.18)" stroke-width="1.2"/>' +
     '<line x1="' + (x + w * 0.5) + '" y1="' + (y + 3) + '" x2="' + (x + w * 0.5) + '" y2="' + (y + h - 3) + '" stroke="rgba(13,38,84,0.18)" stroke-width="1.2"/>' +
@@ -648,7 +652,7 @@ function flowPath(id, d, active, color) {
     '<circle r="5" fill="' + color + '"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#' + id + '"/></animateMotion></circle>';
 }
 
-function powerDiagram(onGrid, isBat2, pct1, pct2, isDay) {
+function powerDiagram(onGrid, isBat2, pct1, pct2) {
   const pole =
     (onGrid
       ? '<g><animate attributeName="opacity" values="1;0.2;1" dur="1.3s" repeatCount="indefinite"/>' +
@@ -700,59 +704,11 @@ function powerDiagram(onGrid, isBat2, pct1, pct2, isDay) {
     flowPath('fB1', 'M240,96 L240,168', !onGrid && !isBat2) +
     flowPath('fB2', 'M370,96 L370,185 L282,185', !onGrid && isBat2) +
     flowPath('fDS', 'M430,96 L430,148', true);
-  const cells = (() => {
-    let c = '';
-    for (let col = 0; col < 4; col++) {
-      for (let row = 0; row < 2; row++) {
-        const cx0 = 274 + col * 18.5, cy0 = 18 + row * 15;
-        c += '<rect x="' + cx0 + '" y="' + cy0 + '" width="16.5" height="13" rx="1.5" fill="#1e40af"/>' +
-             '<line x1="' + (cx0 + 1.5) + '" y1="' + (cy0 + 2) + '" x2="' + (cx0 + 15) + '" y2="' + (cy0 + 2) + '" stroke="#60a5fa" stroke-width="1"/>';
-      }
-    }
-    return c;
-  })();
-  const panel =
-    '<g' + (onGrid ? '' : ' opacity="0.4"') + '>' +
-    '<text x="310" y="9" text-anchor="middle" font-size="8.5" font-weight="700" fill="' + (onGrid ? '#b45309' : '#64748b') + '">SOLAR ' + (onGrid ? 'CHARGING' : 'STANDBY') + '</text>' +
-    '<rect x="270" y="14" width="80" height="36" rx="4" fill="#475569"/>' + cells +
-    '<line x1="288" y1="50" x2="288" y2="57" stroke="#64748b" stroke-width="3"/>' +
-    '<line x1="332" y1="50" x2="332" y2="57" stroke="#64748b" stroke-width="3"/>' +
-    '</g>';
-  const sunRays =
-    '<line x1="400" y1="6" x2="400" y2="1" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="400" y1="30" x2="400" y2="35" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="388" y1="18" x2="383" y2="18" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="412" y1="18" x2="417" y2="18" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="392" y1="10" x2="388" y2="6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="408" y1="10" x2="412" y2="6" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="392" y1="26" x2="388" y2="30" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>' +
-    '<line x1="408" y1="26" x2="412" y2="30" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>';
-  const sunBody =
-    '<circle cx="400" cy="18" r="8.5" fill="#f59e0b"/>' +
-    '<circle cx="400" cy="18" r="6.5" fill="#fbbf24"/>' +
-    '<circle cx="397.2" cy="16" r="1.1" fill="#7c2d12"/>' +
-    '<circle cx="402.8" cy="16" r="1.1" fill="#7c2d12"/>' +
-    '<path d="M396.5,20 Q400,23.5 403.5,20" fill="none" stroke="#7c2d12" stroke-width="1.4" stroke-linecap="round"/>';
-  const sun =
-    (onGrid
-      ? '<g><animateTransform attributeName="transform" type="rotate" from="0 400 18" to="360 400 18" dur="8s" repeatCount="indefinite"/>' + sunRays + '</g>'
-      : '<g>' + sunRays + '</g>') + sunBody;
-  const moon =
-    '<text x="392" y="26" font-size="18">🌙</text>' +
-    '<circle cx="384" cy="8" r="1.3" fill="#cbd5e1"><animate attributeName="opacity" values="1;0.15;1" dur="2.2s" repeatCount="indefinite"/></circle>' +
-    '<circle cx="418" cy="14" r="1.6" fill="#cbd5e1"><animate attributeName="opacity" values="0.2;1;0.2" dur="1.8s" repeatCount="indefinite"/></circle>' +
-    '<circle cx="408" cy="30" r="1.1" fill="#cbd5e1"><animate attributeName="opacity" values="1;0.3;1" dur="2.6s" repeatCount="indefinite"/></circle>';
-  const solar = panel + (isDay ? sun : moon) +
-    flowPath('fSol1', 'M292,50 L292,108', onGrid, '#f59e0b') +
-    flowPath('fSol2', 'M346,50 L346,108', onGrid, '#f59e0b');
-  return '<svg viewBox="0 0 480 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-bottom:6px;">' +
-    solar +
-    '<g transform="translate(0,58)">' +
+  return '<svg viewBox="0 0 480 232" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-bottom:6px;">' +
     flows + pole +
-    svgBattery(240, 'Battery 1', PWR.bat1, pct1, !onGrid && !isBat2, 'standby · โซลาร์ชาร์จ') +
-    svgBattery(400, 'Battery 2', PWR.bat2, pct2, !onGrid && isBat2, onGrid ? 'standby · โซลาร์ชาร์จ' : 'จ่าย D-STAR ต่อเนื่อง') +
-    station + dstar +
-    '</g></svg>';
+    svgBattery(240, 'Battery 1', PWR.bat1, pct1, !onGrid && !isBat2, onGrid, 'standby') +
+    svgBattery(400, 'Battery 2', PWR.bat2, pct2, !onGrid && isBat2, onGrid, 'จ่าย D-STAR ต่อเนื่อง') +
+    station + dstar + '</svg>';
 }
 
 function renderPower(s, upd) {
@@ -789,7 +745,7 @@ function renderPower(s, upd) {
     pct2 = 100 * Math.max(0, usable2 - used2) / usable2;
   }
   const isDay = hr >= 6 && hr < 18;
-  const diagram = powerDiagram(onGrid, isBat2, pct1, pct2, isDay);
+  const diagram = powerDiagram(onGrid, isBat2, pct1, pct2);
   const pb = document.getElementById('powerBody');
   pb.style.background = isDay
     ? 'linear-gradient(180deg,#d9f0ff,#f3faff 30%,#ffffff 58%)'
