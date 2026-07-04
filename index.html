@@ -540,6 +540,7 @@
     </div>
 
     <div class="section-title" style="margin-top:18px;">⚡ Power &amp; Emergency Planning <span class="lh-keyups" id="powerUpdated"></span></div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;font-size:12px;color:#166534;font-weight:600;margin-bottom:10px;">☀️ สถานีนี้ทำงานด้วยพลังงานแสงอาทิตย์ที่ผลิตเองทั้งหมด (off-grid) — ไม่พึ่งพาระบบไฟฟ้าสาธารณะ พร้อมปฏิบัติภารกิจในภาวะภัยพิบัติโดยธรรมชาติ</div>
     <div class="lh-card" id="powerBody"><div style="font-size:12px;color:#999;">กำลังคำนวณ...</div></div>
 
     <div class="lh-card" id="lhCard" style="display:none">
@@ -716,8 +717,8 @@ function renderPower(s, upd) {
     '<div class="ustat"><div class="ul">TX เฉลี่ย/วัน (7 วัน)</div><div class="uv">' + fmtAir(txAvgSec) + '</div><div class="us">≈ ' + Math.round(dailyAh) + ' Ah/วัน รวมสแตนด์บาย</div></div>' +
     '</div>' +
     '<div style="border:1px solid #e0e8ff;border-radius:12px;padding:12px 14px;margin-top:12px;">' +
-    '<div style="font-size:13px;font-weight:700;color:#0d2654;margin-bottom:4px;">🌀 ถ้าไฟ 220V ดับ (โหมดภัยพิบัติ) — แบตพยุงสถานีได้นานแค่ไหน</div>' +
-    '<div style="font-size:11px;color:#888;margin-bottom:10px;">จากการใช้งานจริงเฉลี่ย 7 วัน · ยังไม่รวมโซลาร์ชาร์จกลับตอนกลางวัน — แดดดีอยู่ได้นานกว่านี้</div>' +
+    '<div style="font-size:13px;font-weight:700;color:#0d2654;margin-bottom:4px;">🌀 ฉากทัศน์เลวร้ายสุด — เหลือแบตล้วนๆ ไม่มีชาร์จกลับ</div>' +
+    '<div style="font-size:11px;color:#888;margin-bottom:10px;">กรณีแดดหายหลายวันหรือระบบ 220V ขัดข้อง · คำนวณจากการใช้งานจริงเฉลี่ย 7 วัน · แดดออกเมื่อไหร่โซลาร์ชาร์จกลับ อยู่ได้ต่อเนื่องไม่จำกัด</div>' +
     '<div style="display:flex;flex-direction:column;gap:8px;">' +
     rbar('🔋 Battery 1 (300Ah)', d1, '#b45309') +
     rbar('🔋 Battery 2 (400Ah)', d2, '#185FA5') +
