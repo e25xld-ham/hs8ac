@@ -638,6 +638,13 @@ async function loadStatus() {
     if (!res.ok) throw new Error('http ' + res.status);
     const s = await res.json();
 
+    let upd = '';
+    if (s.updated) {
+      const d = new Date(s.updated);
+      const p = n => String(n).padStart(2, '0');
+      upd = p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+
     const dot   = document.getElementById('statusDot');
     const title = document.getElementById('statusTitle');
     const sub   = document.getElementById('statusSub');
@@ -688,13 +695,6 @@ async function loadStatus() {
         document.getElementById('keyupsToday').textContent =
           kt + ' keyups today' + (upd ? ' \u00b7 updated ' + upd : '');
       }
-    }
-
-    let upd = '';
-    if (s.updated) {
-      const d = new Date(s.updated);
-      const p = n => String(n).padStart(2, '0');
-      upd = p(d.getDate()) + '/' + p(d.getMonth() + 1) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
     }
 
     if (s.usage) {
