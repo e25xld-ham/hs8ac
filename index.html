@@ -307,6 +307,47 @@
     min-width: 52px; text-align: center;
   }
 
+  /* Usage analytics */
+  .usage-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .ustat {
+    background: #f8faff;
+    border: 1px solid #e0e8ff;
+    border-radius: 10px;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  .ustat .ul { font-size: 11px; color: #888; }
+  .ustat .uv { font-size: 17px; font-weight: 800; color: #0d2654; }
+  .ustat .us { font-size: 11px; color: #999; }
+  .usage-sub { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 6px; }
+  .heatmap {
+    display: grid;
+    grid-template-columns: 42px repeat(24, 1fr);
+    gap: 2px;
+  }
+  .heatmap .hlabel { font-size: 10px; color: #888; line-height: 13px; }
+  .heatmap .hhour { font-size: 9px; color: #aaa; text-align: center; }
+  .heatmap .hcell { height: 13px; border-radius: 2px; }
+  .heat-legend {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 10px; color: #999; margin-top: 6px;
+  }
+  .heat-legend i { width: 13px; height: 9px; border-radius: 2px; display: inline-block; }
+  .bars {
+    display: flex; align-items: flex-end; gap: 3px;
+    height: 70px;
+  }
+  .bars div { flex: 1; border-radius: 2px 2px 0 0; min-height: 2px; }
+  .bars-x {
+    display: flex; justify-content: space-between;
+    font-size: 9px; color: #aaa; margin-top: 3px;
+  }
+
   .updated {
     text-align: center;
     font-size: 12px; color: #999;
@@ -456,6 +497,21 @@
       <div id="lhList"></div>
     </div>
 
+    <div class="lh-card" id="usageCard" style="display:none">
+      <div class="lh-head">📊 ความหนาแน่นการใช้งานความถี่</div>
+      <div class="usage-stats" id="usageStats"></div>
+      <div class="usage-sub">Heatmap รายชั่วโมง — 7 วันล่าสุด</div>
+      <div class="heatmap" id="heatmap"></div>
+      <div class="heat-legend">
+        <span>เบา</span>
+        <i style="background:#f0f4fb"></i><i style="background:#dbe8f9"></i><i style="background:#a9cbf0"></i><i style="background:#64a1e0"></i><i style="background:#2d74c4"></i><i style="background:#0d447c"></i>
+        <span>หนาแน่น</span>
+      </div>
+      <div class="usage-sub" style="margin-top:14px;">Airtime ต่อชั่วโมง — 24 ชม.ล่าสุด</div>
+      <div class="bars" id="usageBars"></div>
+      <div class="bars-x" id="usageBarsX"></div>
+    </div>
+
     <div class="updated" id="updated"></div>
   </div>
 
@@ -490,6 +546,51 @@ if (BROADCASTIFY_KEY) {
 function fmtDur(d) {
   if (d < 60) return d + ' วิ';
   return Math.floor(d / 60) + ' นาที ' + (d % 60) + ' วิ';
+}
+
+function fmtAir(s) {
+  if (s < 60) return s + ' วินาที';
+  if (s < 3600) return Math.round(s / 60) + ' นาที';
+  return (s / 3600).toFixed(1) + ' ชม.';
+}
+
+function heatColor(s) {
+  if (s <= 0) return '#f0f4fb';
+  if (s < 60) return '#dbe8f9';
+  if (s < 300) return '#a9cbf0';
+  if (s < 900) return '#64a1e0';
+  if (s < 1800) return '#2d74c4';
+  return '#0d447c';
+}
+
+function renderUsage(u) {
+  const t = u.today || {};
+  document.getElementById('usageStats').innerHTML =
+    '<div class="ustat"><div class="ul">กดคีย์วันนี้</div><div class="uv">' + (t.keys ?? 0) + ' ครั้ง</div>' +
+    '<div class="us">📻 RF ' + (t.rf_keys ?? 0) + ' · 🌐 AllStar ' + (t.asl_keys ?? 0) + '</div></div>' +
+    '<div class="ustat"><div class="ul">Airtime วันนี้</div><div class="uv">' + fmtAir(t.air ?? 0) + '</div>' +
+    '<div class="us">จาก ' + (t.uniq ?? 0) + ' สถานี</div></div>' +
+    '<div class="ustat"><div class="ul">ชั่วโมงพีค</div><div class="uv">' + (t.peak_hour ?? '—') + '</div>' +
+    '<div class="us">' + (t.peak_air ? fmtAir(t.peak_air) : 'ยังไม่มีข้อมูล') + '</div></div>';
+
+  let hm = '<div></div>';
+  for (let h = 0; h < 24; h++) hm += '<div class="hhour">' + (h % 6 === 0 ? h : '') + '</div>';
+  (u.heat || []).forEach(d => {
+    hm += '<div class="hlabel">' + d.day + '</div>';
+    d.vals.forEach((v, h) => {
+      hm += '<div class="hcell" style="background:' + heatColor(v) + '" title="' + d.day + ' ' + h + ':00 — ' + fmtAir(v) + '"></div>';
+    });
+  });
+  document.getElementById('heatmap').innerHTML = hm;
+
+  const bars = u.bars || [];
+  const maxAir = Math.max(60, ...bars.map(b => b.air));
+  document.getElementById('usageBars').innerHTML = bars.map(b =>
+    '<div style="height:' + Math.max(3, Math.round(b.air / maxAir * 100)) + '%;background:' +
+    (b.air / maxAir > 0.5 ? '#185FA5' : '#85B7EB') +
+    '" title="' + b.h + ':00 — ' + fmtAir(b.air) + ' (' + b.keys + ' คีย์)"></div>').join('');
+  document.getElementById('usageBarsX').innerHTML = bars.map((b, i) =>
+    '<span>' + (i % 4 === 0 ? b.h : '') + '</span>').join('');
 }
 
 async function loadStatus() {
@@ -546,6 +647,11 @@ async function loadStatus() {
       if (s.keyups_today != null) {
         document.getElementById('keyupsToday').textContent = 'วันนี้กดคีย์ ' + s.keyups_today + ' ครั้ง';
       }
+    }
+
+    if (s.usage) {
+      document.getElementById('usageCard').style.display = 'block';
+      renderUsage(s.usage);
     }
 
     if (s.updated_display) {
