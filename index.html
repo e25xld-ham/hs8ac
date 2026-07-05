@@ -800,7 +800,7 @@ function powerDiagram(onGrid, isBat2, pct1, pct2, mppt) {
     svgBattery(240, 'Battery 1 · ' + PWR.bat1 + 'Ah', pct1, !onGrid && !isBat2, onGrid, 'standby', '', '#16a34a') +
     svgBattery(400, 'Battery 2 · ' + PWR.bat2 + 'Ah' + ((mppt && mppt.bat_v != null) ? ' · ' + mppt.bat_v.toFixed(1) + 'V' : ''),
       pct2, !onGrid, onGrid, 'standby',
-      (mppt && mppt.chg_w != null) ? ' ' + Math.round(mppt.chg_w) + 'W' : '', '#185FA5') +
+      (mppt && (mppt.chg_w_avg ?? mppt.chg_w) != null) ? ' ~' + Math.round(mppt.chg_w_avg ?? mppt.chg_w) + 'W' : '', '#185FA5') +
     station + dstar + '</svg>';
 }
 
@@ -933,7 +933,7 @@ function renderPower(s, upd) {
     (s.mppt && s.mppt.bat_v != null ?
       '<div class="ustat" style="background:#f0fdf4;border-color:#86efac;"><div class="ul" style="color:#166534;">📡 Battery 2 — ค่าวัดจริงจาก MPPT</div>' +
       '<div class="uv" style="color:#166534;">' + s.mppt.bat_v.toFixed(1) + ' V</div>' +
-      '<div class="us">☀️ ชาร์จ ' + (s.mppt.chg_w ?? 0) + 'W · 🌡️ ' + (s.mppt.temp ?? '—') + '°C · ' + (s.mppt.mode === 'LiFeP04' ? 'LiFePO4' : (s.mppt.mode || '')) + '</div></div>'
+      '<div class="us">☀️ ชาร์จเฉลี่ย/ชม. ' + (s.mppt.chg_w_avg ?? s.mppt.chg_w ?? 0) + 'W (ล่าสุด ' + (s.mppt.chg_w ?? 0) + 'W) · 🌡️ ' + (s.mppt.temp ?? '—') + '°C · ' + (s.mppt.mode === 'LiFeP04' ? 'LiFePO4' : (s.mppt.mode || '')) + '</div></div>'
       : '') +
     '<div class="ustat"><div class="ul">อัตรากินไฟขณะส่ง</div><div class="uv">' + txA + ' A</div><div class="us">' + PWR.txW + 'W @ ' + PWR.volt + 'V · ส่ง 1 นาที = ' + (txA / 60).toFixed(2) + ' Ah</div></div>' +
     '<div class="ustat"><div class="ul">TX เฉลี่ย/วัน (7 วัน)</div><div class="uv">' + fmtAir(txAvgSec) + '</div><div class="us">≈ ' + Math.round(dailyAh) + ' Ah/วัน รวมสแตนด์บาย</div></div>' +
