@@ -115,6 +115,7 @@
     animation: pulse 2s infinite;
   }
   .dot.off { background: #ef4444; box-shadow: 0 0 0 5px rgba(239,68,68,0.18); animation: none; }
+  .dot.stale { background: #94a3b8; box-shadow: 0 0 0 5px rgba(148,163,184,0.18); animation: none; }
   @keyframes pulse {
     0%,100% { box-shadow: 0 0 0 5px rgba(34,197,94,0.18); }
     50%     { box-shadow: 0 0 0 9px rgba(34,197,94,0.08); }
@@ -1146,14 +1147,20 @@ async function loadStatus() {
     const title = document.getElementById('statusTitle');
     const sub   = document.getElementById('statusSub');
 
-    if (s.online) {
-      dot.classList.remove('off');
-      title.textContent = 'Node ' + s.node + ' ออนไลน์';
-      sub.textContent = (s.uptime ? ('อัพไทม์ ' + s.uptime) : 'ระบบทำงานปกติ');
+    // ข้อมูลค้างเกิน 25 นาที = Pi หยุด push (Pi ดับ หรือ เน็ตหลุด) — s.online เป็นค่าค้างเชื่อไม่ได้
+    const ageMin = s.updated ? (Date.now() - new Date(s.updated).getTime()) / 60000 : 999;
+    dot.classList.remove('off', 'stale');
+    if (ageMin > 25) {
+      dot.classList.add('stale');
+      title.innerHTML = 'ระบบไม่ตอบสนอง';
+      sub.textContent = 'Pi ดับ หรือ เน็ตหลุด · ข้อมูลค้างตั้งแต่ ' + (upd || '—');
+    } else if (s.online) {
+      title.innerHTML = 'ระบบ AllStarLink ออนไลน์ <span style="font-size:12px;font-weight:600;color:#16a34a;">● Node ' + s.node + '</span>';
+      sub.textContent = 'Uptime ' + fmtUptime(s.uptime);
     } else {
       dot.classList.add('off');
-      title.textContent = 'Node ' + s.node + ' ออฟไลน์';
-      sub.textContent = 'ไม่สามารถเชื่อมต่อระบบได้ในขณะนี้';
+      title.innerHTML = 'ระบบ AllStarLink ออฟไลน์';
+      sub.textContent = 'Asterisk ไม่ตอบสนอง (Pi ยังทำงาน) · ' + (upd || '');
     }
 
     document.getElementById('aslUsers').textContent = s.asl_users ?? '—';
@@ -1201,6 +1208,19 @@ async function loadStatus() {
   } catch (e) {
     document.getElementById('statusSub').textContent = 'ยังไม่มีข้อมูลสถานะ';
   }
+}
+
+function fmtUptime(str) {
+  if (!str) return '—';
+  const p = str.split(':').map(Number);
+  if (p.length < 2 || isNaN(p[0])) return str;
+  const totalH = p[0], mins = p[1];
+  const days = Math.floor(totalH / 24), hrs = totalH % 24;
+  let out = '';
+  if (days > 0) out += days + ' วัน ';
+  if (hrs > 0 || days > 0) out += hrs + ' ชั่วโมง ';
+  out += mins + ' นาที';
+  return out.trim();
 }
 
 function renderLH(entries) {
