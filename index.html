@@ -931,12 +931,29 @@ function renderPower(s, upd) {
     '<div class="stack-legend" id="powerDayLegend" style="margin-top:5px;"></div>' +
     '<div class="usage-stats" style="margin-top:12px;">' +
     (s.mppt && s.mppt.bat_v != null ?
-      '<div class="ustat" style="background:#f0fdf4;border-color:#86efac;"><div class="ul" style="color:#166534;">📡 Battery 2 — ค่าวัดจริงจาก MPPT</div>' +
+      '<div class="ustat" style="background:#f0fdf4;border-color:#86efac;position:relative;">' +
+      '<span style="position:absolute;top:-10px;right:12px;background:#f0fdf4;padding:0 5px;line-height:0;">' +
+      '<svg width="32" height="17" viewBox="0 0 32 17" style="vertical-align:middle;">' +
+      '<rect x="1.5" y="2.5" width="25" height="12" rx="3.5" fill="#ffffff" stroke="#16a34a" stroke-width="2.2"/>' +
+      '<rect x="28" y="6" width="3.5" height="5.5" rx="1.5" fill="#16a34a"/>' +
+      '<rect x="4" y="5" width="17" height="7" rx="2" fill="#22c55e"/>' +
+      '</svg></span>' +
+      '<div class="ul" style="color:#166534;">📡 Battery 2 — ค่าวัดจริงจาก MPPT</div>' +
       '<div class="uv" style="color:#166534;">' + s.mppt.bat_v.toFixed(1) + ' V</div>' +
       '<div class="us">☀️ ชาร์จเฉลี่ย/ชม. ' + (s.mppt.chg_w_avg ?? s.mppt.chg_w ?? 0) + 'W (ล่าสุด ' + (s.mppt.chg_w ?? 0) + 'W) · 🌡️ ' + (s.mppt.temp ?? '—') + '°C · ' + (s.mppt.mode === 'LiFeP04' ? 'LiFePO4' : (s.mppt.mode || '')) + '</div></div>'
       : '') +
     (s.mppt && s.mppt.pv_v != null ?
-      '<div class="ustat" style="background:#fffbeb;border-color:#fde68a;"><div class="ul" style="color:#92400e;">☀️ แผงโซลาร์ (PV)</div>' +
+      '<div class="ustat" style="background:#fffbeb;border-color:#fde68a;position:relative;">' +
+      '<span style="position:absolute;top:-12px;right:12px;background:#fffbeb;padding:0 5px;line-height:0;">' +
+      '<svg width="28" height="22" viewBox="0 0 28 22" style="vertical-align:middle;">' +
+      '<rect x="2" y="1.5" width="24" height="14" rx="2.5" fill="#1d4ed8" stroke="#475569" stroke-width="1.8"/>' +
+      '<line x1="10" y1="2" x2="10" y2="15" stroke="#93c5fd" stroke-width="1"/>' +
+      '<line x1="18" y1="2" x2="18" y2="15" stroke="#93c5fd" stroke-width="1"/>' +
+      '<line x1="2.5" y1="8.5" x2="25.5" y2="8.5" stroke="#93c5fd" stroke-width="1"/>' +
+      '<line x1="14" y1="16" x2="14" y2="20" stroke="#475569" stroke-width="2.2"/>' +
+      '<line x1="9" y1="20.5" x2="19" y2="20.5" stroke="#475569" stroke-width="2"/>' +
+      '</svg></span>' +
+      '<div class="ul" style="color:#92400e;">☀️ แผงโซลาร์ (PV)</div>' +
       '<div class="uv" style="color:#92400e;">' + s.mppt.pv_v.toFixed(1) + ' V</div>' +
       '<div class="us">ผลิตวันนี้ ' + (s.mppt.day_kwh ?? 0).toFixed(2) + ' kWh · สะสม ' + Math.round(s.mppt.total_kwh ?? 0).toLocaleString() + ' kWh</div></div>'
       : '<div class="ustat"><div class="ul">อัตรากินไฟขณะส่ง</div><div class="uv">' + txA + ' A</div><div class="us">' + PWR.txW + 'W @ ' + PWR.volt + 'V</div></div>') +
