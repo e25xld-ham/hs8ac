@@ -818,7 +818,7 @@ function powerDiagram(onGrid, isBat2, pct1, pct2, mppt) {
     flowPath('fDS', 'M430,96 L430,148', true);
   return '<svg viewBox="0 0 480 232" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-bottom:6px;">' +
     flows + pole +
-    svgBattery(240, 'Battery 1 · ' + PWR.bat1 + 'Ah', pct1, !onGrid && !isBat2, onGrid, 'standby', '', '#16a34a') +
+    svgBattery(240, 'Battery 1 · ' + PWR.bat1 + 'Ah', pct1, !onGrid && !isBat2, onGrid, bat1Note || 'standby', '', '#16a34a') +
     svgBattery(400, 'Battery 2 · ' + PWR.bat2 + 'Ah' + ((mppt && mppt.bat_v != null) ? ' · ' + mppt.bat_v.toFixed(1) + 'V' : ''),
       pct2, !onGrid, onGrid, 'standby',
       (mppt && (mppt.chg_w_avg ?? mppt.chg_w) != null) ? ' ~' + Math.round(mppt.chg_w_avg ?? mppt.chg_w) + 'W' : '', '#185FA5') +
@@ -867,7 +867,26 @@ function renderPower(s, upd) {
   }
   const act1 = !onGrid && !isBat2, act2 = !onGrid && isBat2;
   const usable1 = PWR.bat1 * PWR.dod, usable2 = PWR.bat2 * PWR.dod;
-  const pct1 = act1 ? 100 * Math.max(0, usable1 - analogUsed) / usable1 : 100;
+  let pct1 = act1 ? 100 * Math.max(0, usable1 - analogUsed) / usable1 : 100;
+  // Battery 1: ถ้ามีค่าแรงดันที่แอดมินวัดมา ใช้เป็นจุดตั้งต้น แล้วหัก airtime หลังเวลาที่วัด
+  let bat1Note = null;
+  const b1 = s.bat1_manual;
+  if (!onGrid && b1 && b1.v != null) {
+    const basePct = Math.max(0, Math.min(100, 61 + (b1.v - 13.1) * (39 / 0.7)));
+    let usedSince = 0;
+    const anchorH = new Date(b1.t * 1000).getHours() + new Date(b1.t * 1000).getMinutes() / 60;
+    // หัก airtime + สแตนด์บาย ตั้งแต่ชั่วโมงที่วัด จนถึงตอนนี้ (เฉพาะคืนเดียวกัน)
+    if (b1.t * 1000 > Date.now() - 16 * 3600 * 1000) {
+      const fromH = Math.floor(anchorH);
+      for (let h = fromH; h <= hr && h < bars.length; h++) usedSince += bars[h]?.air ?? 0;
+      const hrsElapsed = Math.max(0, (hr + minFrac) - anchorH);
+      const usedAh = baseA * hrsElapsed + txA * usedSince / 3600;
+      pct1 = Math.max(0, basePct - 100 * usedAh / usable1);
+      const hm = String(new Date(b1.t * 1000).getHours()).padStart(2,'0') + ':' +
+                 String(new Date(b1.t * 1000).getMinutes()).padStart(2,'0');
+      bat1Note = 'วัด ' + b1.v + 'V @ ' + hm;
+    }
+  }
   // Battery 2: % จากแรงดันวัดจริง — พักเต็ม 13.8V = 100% (ขณะชาร์จขึ้นถึง 14.4V ก็ 100%), 13.1V = 61%
   // โหลด D-STAR สะท้อนอยู่ในแรงดันจริงแล้ว ไม่ต้องหักโมเดลซ้ำ
   let pct2 = 100;
