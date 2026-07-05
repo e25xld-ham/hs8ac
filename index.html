@@ -970,7 +970,19 @@ function renderPower(s, upd) {
     '<div class="bars-x" id="powerDayBarsX"></div>' +
     '<div class="stack-legend" id="powerDayLegend" style="margin-top:5px;"></div>' +
     '<div class="usage-stats" style="margin-top:12px;">' +
-    (s.mppt && s.mppt.bat_v != null ?
+    (s.bat1_manual && s.bat1_manual.v != null ?
+      '<div class="ustat" style="background:#f0fdf4;border-color:#86efac;position:relative;">' +
+      '<span style="position:absolute;top:-10px;right:12px;background:#f0fdf4;padding:0 5px;line-height:0;">' +
+      '<svg width="32" height="17" viewBox="0 0 32 17" style="vertical-align:middle;">' +
+      '<rect x="1.5" y="2.5" width="25" height="12" rx="3.5" fill="#ffffff" stroke="#16a34a" stroke-width="2.2"/>' +
+      '<rect x="28" y="6" width="3.5" height="5.5" rx="1.5" fill="#16a34a"/>' +
+      '<rect x="4" y="5" width="17" height="7" rx="2" fill="#22c55e"/>' +
+      '</svg></span>' +
+      '<div class="ul" style="color:#166534;">\ud83d\udd0b Battery 1 — \u0e04\u0e48\u0e32\u0e27\u0e31\u0e14\u0e42\u0e14\u0e22\u0e41\u0e2d\u0e14\u0e21\u0e34\u0e19</div>' +
+      '<div class="uv" style="color:#166534;">' + s.bat1_manual.v.toFixed(1) + ' V</div>' +
+      '<div class="us">\ud83d\udd50 \u0e27\u0e31\u0e14\u0e40\u0e21\u0e37\u0e48\u0e2d ' + (function(){var d=new Date(s.bat1_manual.t*1000);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');})() + ' \u00b7 controller offline \u00b7 300Ah LiFePO4</div></div>'
+      : '') +
+        (s.mppt && s.mppt.bat_v != null ?
       '<div class="ustat" style="background:#f0fdf4;border-color:#86efac;position:relative;">' +
       '<span style="position:absolute;top:-10px;right:12px;background:#f0fdf4;padding:0 5px;line-height:0;">' +
       '<svg width="32" height="17" viewBox="0 0 32 17" style="vertical-align:middle;">' +
@@ -999,7 +1011,7 @@ function renderPower(s, upd) {
       : '<div class="ustat"><div class="ul">อัตรากินไฟขณะส่ง</div><div class="uv">' + txA + ' A</div><div class="us">' + PWR.txW + 'W @ ' + PWR.volt + 'V</div></div>') +
     '<div class="ustat"><div class="ul">TX เฉลี่ย/วัน (7 วัน)</div><div class="uv">' + fmtAir(txAvgSec) + '</div><div class="us">≈ ' + Math.round(dailyAh) + ' Ah/วัน รวมสแตนด์บาย</div></div>' +
     '</div>' +
-    '<div style="font-size:10px;color:#999;margin-top:8px;">* ค่าสมมติ: สแตนด์บาย ' + PWR.standbyA + 'A · ลิเธียมดึงไฟได้ ' + Math.round(PWR.dod * 100) + '% ของความจุ · Battery 2 % จากแรงดันวัดจริง (ชาร์จเต็ม 14.4V / พักเต็ม 13.8V = 100% · 13.1V = 61%) · Battery 1 % เป็นค่าประเมิน</div>';
+    '<div style="font-size:10px;color:#999;margin-top:8px;">* ค่าสมมติ: สแตนด์บาย ' + PWR.standbyA + 'A · ลิเธียมดึงไฟได้ ' + Math.round(PWR.dod * 100) + '% ของความจุ · Battery 2 % จากแรงดันวัดจริง (ชาร์จเต็ม 14.4V / พักเต็ม 13.8V = 100% · 13.1V = 61%) · Battery 1 controller offline — %/แรงดันเป็นค่าที่แอดมินวัดแล้วให้ระบบหัก airtime ต่อ</div>';
 
   const days = s.usage?.days || [];
   if (days.length > 0) {
