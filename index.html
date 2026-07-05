@@ -935,7 +935,11 @@ function renderPower(s, upd) {
       '<div class="uv" style="color:#166534;">' + s.mppt.bat_v.toFixed(1) + ' V</div>' +
       '<div class="us">☀️ ชาร์จเฉลี่ย/ชม. ' + (s.mppt.chg_w_avg ?? s.mppt.chg_w ?? 0) + 'W (ล่าสุด ' + (s.mppt.chg_w ?? 0) + 'W) · 🌡️ ' + (s.mppt.temp ?? '—') + '°C · ' + (s.mppt.mode === 'LiFeP04' ? 'LiFePO4' : (s.mppt.mode || '')) + '</div></div>'
       : '') +
-    '<div class="ustat"><div class="ul">อัตรากินไฟขณะส่ง</div><div class="uv">' + txA + ' A</div><div class="us">' + PWR.txW + 'W @ ' + PWR.volt + 'V · ส่ง 1 นาที = ' + (txA / 60).toFixed(2) + ' Ah</div></div>' +
+    (s.mppt && s.mppt.pv_v != null ?
+      '<div class="ustat" style="background:#fffbeb;border-color:#fde68a;"><div class="ul" style="color:#92400e;">☀️ แผงโซลาร์ (PV)</div>' +
+      '<div class="uv" style="color:#92400e;">' + s.mppt.pv_v.toFixed(1) + ' V</div>' +
+      '<div class="us">ผลิตวันนี้ ' + (s.mppt.day_kwh ?? 0).toFixed(2) + ' kWh · สะสม ' + Math.round(s.mppt.total_kwh ?? 0).toLocaleString() + ' kWh</div></div>'
+      : '<div class="ustat"><div class="ul">อัตรากินไฟขณะส่ง</div><div class="uv">' + txA + ' A</div><div class="us">' + PWR.txW + 'W @ ' + PWR.volt + 'V</div></div>') +
     '<div class="ustat"><div class="ul">TX เฉลี่ย/วัน (7 วัน)</div><div class="uv">' + fmtAir(txAvgSec) + '</div><div class="us">≈ ' + Math.round(dailyAh) + ' Ah/วัน รวมสแตนด์บาย</div></div>' +
     '</div>' +
     '<div style="font-size:10px;color:#999;margin-top:8px;">* ค่าสมมติ: สแตนด์บาย ' + PWR.standbyA + 'A · ลิเธียมดึงไฟได้ ' + Math.round(PWR.dod * 100) + '% ของความจุ · Battery 2 % จากแรงดันวัดจริง (ชาร์จเต็ม 14.4V / พักเต็ม 13.8V = 100% · 13.1V = 61%) · Battery 1 % เป็นค่าประเมิน</div>';
