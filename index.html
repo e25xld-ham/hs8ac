@@ -726,9 +726,9 @@ const PWR = {
 
 function svgBattery(cx, nameLabel, pct, active, charging, note, chgExtra, nameColor) {
   const p = Math.max(0, Math.min(100, Math.round(pct)));
-  const fill = p >= 80 ? '#22c55e' : p >= 40 ? '#f59e0b' : '#dc2626';
-  const frame = p >= 80 ? '#16a34a' : p >= 40 ? '#d97706' : '#b91c1c';
-  const lowBlink = p < 40 ? '<animate attributeName="opacity" values="1;0.25;1" dur="0.9s" repeatCount="indefinite"/>' : '';
+  const fill = p >= 50 ? '#22c55e' : p >= 20 ? '#f59e0b' : '#dc2626';
+  const frame = p >= 50 ? '#16a34a' : p >= 20 ? '#d97706' : '#b91c1c';
+  const lowBlink = p < 20 ? '<animate attributeName="opacity" values="1;0.25;1" dur="0.9s" repeatCount="indefinite"/>' : '';
   const w = 110, x = cx - w / 2, y = 52, h = 40;
   let s = '';
   if (active) {
