@@ -761,7 +761,7 @@ function flowPath(id, d, active, color) {
     '<circle r="5" fill="' + color + '"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#' + id + '"/></animateMotion></circle>';
 }
 
-function powerDiagram(onGrid, isBat2, pct1, pct2, mppt) {
+function powerDiagram(onGrid, isBat2, pct1, pct2, mppt, bat1Note) {
   const pole =
     (onGrid
       ? '<g><animate attributeName="opacity" values="1;0.2;1" dur="1.3s" repeatCount="indefinite"/>' +
@@ -896,7 +896,7 @@ function renderPower(s, upd) {
     pct2 = 100 * Math.max(0, usable2 - analogUsed) / usable2;
   }
   const isDay = hr >= 6 && hr < 18;
-  const diagram = powerDiagram(onGrid, isBat2, pct1, pct2, s.mppt);
+  const diagram = powerDiagram(onGrid, isBat2, pct1, pct2, s.mppt, bat1Note);
   const pb = document.getElementById('powerBody');
   pb.style.background = isDay
     ? 'linear-gradient(180deg,#d9f0ff,#f3faff 30%,#ffffff 58%)'
