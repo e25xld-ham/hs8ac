@@ -261,39 +261,54 @@
   }
 
   .conn-console {
-    margin-top: 12px;
-    background: linear-gradient(180deg, #0c1c38, #12264a);
-    border: 1px solid #274b85;
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-family: monospace;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #e0e8ff;
   }
   .conn-head {
     display: flex; justify-content: space-between; align-items: baseline;
-    color: #6f95cf; font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px; margin-bottom: 8px;
+    font-size: 10.5px; font-weight: 800; color: #94a3b8;
+    letter-spacing: 1.2px; margin-bottom: 8px;
   }
   .conn-row {
-    display: flex; align-items: center; gap: 9px;
-    padding: 7px 9px; border-radius: 8px;
-    font-size: 12.5px; color: #dbe8f9;
-    border: 1px solid transparent;
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 3px 10px;
+    padding: 8px 12px; border-radius: 10px;
+    background: #f8faff; border: 1px solid #e0e8ff;
+    font-size: 13px; color: #0d2654;
+    margin-bottom: 6px;
+    transition: background 0.3s, color 0.3s;
   }
+  .conn-row.local { background: #eff6ff; border-color: #dbe6ff; }
   .conn-row.talking {
-    background: rgba(22,163,74,0.22);
-    border-color: #16a34a;
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    border-color: #15803d;
+    color: #ffffff;
+    animation: txglow 1.6s ease-in-out infinite;
   }
-  .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #35558c; flex: none; }
-  .conn-row.talking .conn-dot { background: #22c55e; animation: livepulse 1s ease-in-out infinite; }
-  .conn-name { font-weight: 700; color: #ffffff; white-space: nowrap; }
-  .conn-info { flex: 1; min-width: 60px; color: #8fa8cc; font-size: 11px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .conn-ct { color: #6f95cf; font-size: 11px; white-space: nowrap; }
+  @keyframes txglow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
+    50% { box-shadow: 0 0 0 7px rgba(34,197,94,0); }
+  }
+  .conn-dot { width: 9px; height: 9px; border-radius: 50%; background: #cbd5e1; flex: none; }
+  .conn-row.local .conn-dot { background: #3b82f6; }
+  .conn-row.talking .conn-dot { background: #ffffff; animation: livepulse 0.9s ease-in-out infinite; }
+  .conn-name { font-family: monospace; font-weight: 800; white-space: nowrap; }
+  .conn-info {
+    flex: 1 1 110px; min-width: 0;
+    font-size: 11.5px; color: #64748b;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .conn-row.talking .conn-info { color: #dcfce7; }
+  .conn-meta { display: flex; align-items: center; gap: 6px; margin-left: auto; white-space: nowrap; }
+  .conn-ct { font-family: monospace; font-size: 11px; color: #94a3b8; }
+  .conn-row.talking .conn-ct { color: #dcfce7; }
   .conn-badge {
-    font-size: 9px; font-weight: 700; padding: 1.5px 7px; border-radius: 4px;
-    background: #1e3a6e; color: #93c5fd; white-space: nowrap;
+    font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 5px;
+    background: #eef2fa; color: #5b7bb0;
   }
-  .conn-badge.tx { background: #14532d; color: #86efac; }
+  .conn-row.talking .conn-badge { background: rgba(255,255,255,0.25); color: #ffffff; }
+  .conn-badge.tx { background: #ffffff; color: #15803d; }
 
   .talking-now {
     margin-top: 12px;
@@ -1129,24 +1144,26 @@ function renderConsole(links, rfActive) {
   box.style.display = 'block';
   const modeName = m => m === 'T' ? 'TRX' : m === 'R' ? 'RX' : m === 'C' ? 'CONN' : '';
   let rows =
-    '<div class="conn-row' + (rfActive ? ' talking' : '') + '">' +
+    '<div class="conn-row local' + (rfActive ? ' talking' : '') + '">' +
     '<div class="conn-dot"></div>' +
     '<span class="conn-name">620540</span>' +
     '<span class="conn-info">HS8AC · E24BK 145.700 MHz</span>' +
-    (rfActive ? '<span class="conn-badge tx">● COS · RF</span>' : '<span class="conn-badge">LOCAL</span>') +
-    '</div>';
+    '<span class="conn-meta">' +
+    (rfActive ? '<span class="conn-badge tx">● ON AIR · RF</span>' : '<span class="conn-badge">LOCAL</span>') +
+    '</span></div>';
   rows += links.map(l =>
     '<div class="conn-row' + (l.k ? ' talking' : '') + '">' +
     '<div class="conn-dot"></div>' +
     '<span class="conn-name">' + l.n + '</span>' +
     '<span class="conn-info">' + (l.i || '') + '</span>' +
+    '<span class="conn-meta">' +
     (l.ct ? '<span class="conn-ct">' + l.ct + '</span>' : '') +
     (l.dir ? '<span class="conn-badge">' + l.dir + '</span>' : '') +
-    (l.k ? '<span class="conn-badge tx">● TX</span>' : (l.m ? '<span class="conn-badge">' + modeName(l.m) + '</span>' : '')) +
-    '</div>'
+    (l.k ? '<span class="conn-badge tx">● ON AIR</span>' : (l.m ? '<span class="conn-badge">' + modeName(l.m) + '</span>' : '')) +
+    '</span></div>'
   ).join('');
   box.innerHTML =
-    '<div class="conn-head"><span>▮▮ CONNECTION STATUS</span><span>' +
+    '<div class="conn-head"><span>CONNECTION STATUS</span><span>' +
     links.length + ' NODE' + (links.length === 1 ? '' : 'S') + ' CONNECTED</span></div>' + rows;
 }
 
