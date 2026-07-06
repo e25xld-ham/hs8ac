@@ -1048,15 +1048,16 @@ function renderPower(s, upd) {
     '<div style="border:2px solid #16a34a;background:#f0fdf4;border-radius:14px;padding:10px 14px;margin:12px 0;display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap;">' +
     '<div style="text-align:center;flex:0 0 auto;min-width:104px;">' +
     '<div style="font-size:12px;color:#166534;font-weight:700;white-space:nowrap;">⚡ ใช้พลังงานวันนี้</div>' +
-    '<div style="font-size:28px;font-weight:800;color:#0d2654;line-height:1.15;">' + Math.round(totalAh) + ' <span style="font-size:14px;">Ah</span></div>' +
+    '<div style="font-size:28px;font-weight:800;color:#0d2654;line-height:1.1;">' + Math.round(totalAh) + ' <span style="font-size:14px;">Ah</span></div>' +
+    '<div style="font-size:13px;font-weight:700;color:#059669;">≈ ' + Math.round(totalAh * PWR.volt) + ' <span style="font-size:11px;font-weight:400;">Wh</span></div>' +
     '</div>' +
     '<div style="flex:1;min-width:170px;">' +
     '<div style="display:flex;height:13px;border-radius:7px;overflow:hidden;margin-bottom:6px;">' +
     (batPct > 0 ? '<div style="width:' + batPct + '%;background:#16a34a;"></div>' : '') +
     (gridPct > 0 ? '<div style="width:' + gridPct + '%;background:#f59e0b;"></div>' : '') +
     '</div>' +
-    '<div style="font-size:12px;color:#0d2654;white-space:nowrap;">🔋 ' + batName + ' <b>' + Math.round(batAhUsed) + ' Ah (' + batPct + '%)</b></div>' +
-    '<div style="font-size:12px;color:#0d2654;white-space:nowrap;">🔌 ไฟ 220V <b>' + Math.round(gridAhUsed) + ' Ah (' + gridPct + '%)</b></div>' +
+    '<div style="font-size:12px;color:#0d2654;white-space:nowrap;">🔋 ' + batName + ' <b>' + Math.round(batAhUsed) + ' Ah · ' + Math.round(batAhUsed * PWR.volt) + ' Wh (' + batPct + '%)</b></div>' +
+    '<div style="font-size:12px;color:#0d2654;white-space:nowrap;">🔌 ไฟ 220V <b>' + Math.round(gridAhUsed) + ' Ah · ' + Math.round(gridAhUsed * PWR.volt) + ' Wh (' + gridPct + '%)</b></div>' +
     '</div>' +
     '</div>' +
     '<div class="usage-sub">Power consumption per hour (Ah) — today · <span style="color:#16a34a;">■</span> จากแบต <span style="color:#f59e0b;">■</span> จากไฟ 220V · แท่งไม่มีเลข = standby ' + baseA.toFixed(1) + ' Ah</div>' +
