@@ -534,17 +534,17 @@
   <div class="panel">
 
     <!-- Tab buttons -->
-    <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid #e0e8ff;">
+    <div style="display:flex;gap:8px;margin-bottom:18px;padding:6px;background:#f0f4ff;border-radius:14px;">
       <button id="tab-btn-1" onclick="switchTab(1)"
-        style="flex:1;padding:10px 0;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:#1a4a9e;border-bottom:3px solid #1a4a9e;margin-bottom:-2px;">
+        style="flex:1;padding:9px 4px;font-size:12.5px;font-weight:800;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,#1a4a9e,#2563eb);color:#fff;box-shadow:0 3px 10px rgba(26,74,158,0.35);transition:all .2s;">
         🛎️ บริการสมาชิก
       </button>
       <button id="tab-btn-2" onclick="switchTab(2)"
-        style="flex:1;padding:10px 0;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:#aaa;border-bottom:3px solid transparent;margin-bottom:-2px;">
+        style="flex:1;padding:9px 4px;font-size:12.5px;font-weight:800;border:none;border-radius:10px;cursor:pointer;background:none;color:#888;transition:all .2s;">
         📡 E24BK
       </button>
       <button id="tab-btn-3" onclick="switchTab(3)"
-        style="flex:1;padding:10px 0;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:#aaa;border-bottom:3px solid transparent;margin-bottom:-2px;">
+        style="flex:1;padding:9px 4px;font-size:12.5px;font-weight:800;border:none;border-radius:10px;cursor:pointer;background:none;color:#888;transition:all .2s;">
         🔧 E24BL
       </button>
     </div>
@@ -1420,12 +1420,24 @@ function toggleCard(card) {
   card.querySelector('.go').textContent = wasOpen ? '▾ ดูรายละเอียด' : '▴ ซ่อนรายละเอียด';
 }
 
+var TAB_COLORS = {
+  1: 'linear-gradient(135deg,#1a4a9e,#2563eb)',
+  2: 'linear-gradient(135deg,#059669,#10b981)',
+  3: 'linear-gradient(135deg,#d97706,#f59e0b)'
+};
 function switchTab(n) {
   [1,2,3].forEach(function(i) {
     document.getElementById('tab-' + i).style.display = n === i ? '' : 'none';
     var b = document.getElementById('tab-btn-' + i);
-    b.style.color = n === i ? '#1a4a9e' : '#aaa';
-    b.style.borderBottom = n === i ? '3px solid #1a4a9e' : '3px solid transparent';
+    if (n === i) {
+      b.style.background = TAB_COLORS[i];
+      b.style.color = '#fff';
+      b.style.boxShadow = '0 3px 10px rgba(0,0,0,0.2)';
+    } else {
+      b.style.background = 'none';
+      b.style.color = '#888';
+      b.style.boxShadow = 'none';
+    }
   });
 }
 </script>
