@@ -533,6 +533,19 @@
 
   <div class="panel">
 
+    <!-- Tab buttons -->
+    <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid #e0e8ff;">
+      <button id="tab-btn-1" onclick="switchTab(1)"
+        style="flex:1;padding:10px 0;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;color:#1a4a9e;border-bottom:3px solid #1a4a9e;margin-bottom:-2px;">
+        🏠 ข้อมูลสมาคม
+      </button>
+      <button id="tab-btn-2" onclick="switchTab(2)"
+        style="flex:1;padding:10px 0;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;color:#aaa;border-bottom:3px solid transparent;margin-bottom:-2px;">
+        📡 สถานีทวนสัญญาณ
+      </button>
+    </div>
+
+    <div id="tab-1">
     <!-- Services -->
     <div class="section-title" style="--s1:#06c755;--s2:#6ee7a8;">🛎️ บริการสมาชิก</div>
     <div class="services">
@@ -619,8 +632,11 @@
     </div>
 
 
+    </div><!-- end tab-1 -->
+
+    <div id="tab-2" style="display:none">
     <!-- Node status -->
-    <div id="usageSection" style="display:none">
+    <div id="usageSection">
     <div class="section-title" style="margin-top:18px;--s1:#7c3aed;--s2:#c084fc;">📊 On-Air Activity</div>
     <div class="lh-card">
       <div class="onair-bar idle" id="onairBar" style="display:none"></div>
@@ -693,6 +709,8 @@
     </div>
 
     <div class="updated" id="updated"></div>
+    </div><!-- end tab-2 -->
+
   </div>
 
   <div class="footer">
@@ -1246,7 +1264,6 @@ async function loadStatus() {
     try { renderPower(s, upd); } catch (e) {}
 
     if (s.usage) {
-      document.getElementById('usageSection').style.display = 'block';
       renderUsage(s.usage);
     }
 
@@ -1359,6 +1376,17 @@ function toggleCard(card) {
   const wasOpen = card.classList.contains('open');
   card.classList.toggle('open');
   card.querySelector('.go').textContent = wasOpen ? '▾ ดูรายละเอียด' : '▴ ซ่อนรายละเอียด';
+}
+
+function switchTab(n) {
+  document.getElementById('tab-1').style.display = n === 1 ? '' : 'none';
+  document.getElementById('tab-2').style.display = n === 2 ? '' : 'none';
+  var b1 = document.getElementById('tab-btn-1');
+  var b2 = document.getElementById('tab-btn-2');
+  b1.style.color = n === 1 ? '#1a4a9e' : '#aaa';
+  b1.style.borderBottom = n === 1 ? '3px solid #1a4a9e' : '3px solid transparent';
+  b2.style.color = n === 2 ? '#1a4a9e' : '#aaa';
+  b2.style.borderBottom = n === 2 ? '3px solid #1a4a9e' : '3px solid transparent';
 }
 </script>
 </body>
