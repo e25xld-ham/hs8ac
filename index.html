@@ -687,13 +687,21 @@
     <span style="font-size:13px;font-weight:600;">สมาคมวิทยุสมัครเล่นจังหวัดชุมพร HS8AC</span><br>
     99 หมู่ 8 ตำบลขุนกระทิง อำเภอเมือง จังหวัดชุมพร 86190<br><br>
     <span style="font-size:11px;">พัฒนาระบบโดย <a href="https://www.qrz.com/db/E25XLD" target="_blank" style="color:#FFD700;text-decoration:none;font-weight:700;">E25XLD</a> also <a href="https://www.qrz.com/db/KE9CYN" target="_blank" style="color:#FFD700;text-decoration:none;font-weight:700;">KE9CYN</a></span><br><br>
-    <span id="visitor-badge"></span>
+    <span id="visitor-badge"></span><br>
+    <span id="owner-btn-wrap" style="margin-top:6px;display:inline-block;"></span>
     <script>
       (function(){
         var key = 'hs8ac_owner';
-        if (!localStorage.getItem(key)) {
-          document.getElementById('visitor-badge').innerHTML =
-            '<img src="https://visitor-badge.laobi.icu/badge?page_id=e25xld-ham.hs8ac&left_text=Visitors&left_color=%231a4a9e&right_color=%23555555" alt="visitor counter" style="height:20px;vertical-align:middle;">';
+        var badge = document.getElementById('visitor-badge');
+        var btnWrap = document.getElementById('owner-btn-wrap');
+
+        if (localStorage.getItem(key)) {
+          // เจ้าของ — ไม่นับ แสดงปุ่มยกเลิก
+          btnWrap.innerHTML = '<span style="font-size:10px;color:#aaa;">🙈 ไม่นับการเข้าชมของคุณ · <a href="#" onclick="localStorage.removeItem(\'hs8ac_owner\');location.reload();return false;" style="color:#FFD700;text-decoration:none;">ยกเลิก</a></span>';
+        } else {
+          // ผู้เยี่ยมชมทั่วไป — โหลด badge (นับ) + แสดงปุ่มเจ้าของ
+          badge.innerHTML = '<img src="https://visitor-badge.laobi.icu/badge?page_id=e25xld-ham.hs8ac&left_text=Visitors&left_color=%231a4a9e&right_color=%23555555" alt="visitor counter" style="height:20px;vertical-align:middle;">';
+          btnWrap.innerHTML = '<a href="#" onclick="localStorage.setItem(\'hs8ac_owner\',\'1\');location.reload();return false;" style="font-size:10px;color:#aaa;text-decoration:none;">🙋 ฉันคือเจ้าของ — ไม่ต้องนับฉัน</a>';
         }
       })();
     </script>
