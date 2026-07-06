@@ -536,12 +536,16 @@
     <!-- Tab buttons -->
     <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid #e0e8ff;">
       <button id="tab-btn-1" onclick="switchTab(1)"
-        style="flex:1;padding:10px 0;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;color:#1a4a9e;border-bottom:3px solid #1a4a9e;margin-bottom:-2px;">
-        🏠 ข้อมูลสมาคม
+        style="flex:1;padding:10px 0;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:#1a4a9e;border-bottom:3px solid #1a4a9e;margin-bottom:-2px;">
+        🛎️ บริการสมาชิก
       </button>
       <button id="tab-btn-2" onclick="switchTab(2)"
-        style="flex:1;padding:10px 0;font-size:14px;font-weight:700;border:none;background:none;cursor:pointer;color:#aaa;border-bottom:3px solid transparent;margin-bottom:-2px;">
-        📡 สถานีทวนสัญญาณ
+        style="flex:1;padding:10px 0;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:#aaa;border-bottom:3px solid transparent;margin-bottom:-2px;">
+        📡 E24BK
+      </button>
+      <button id="tab-btn-3" onclick="switchTab(3)"
+        style="flex:1;padding:10px 0;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:#aaa;border-bottom:3px solid transparent;margin-bottom:-2px;">
+        🔧 E24BL
       </button>
     </div>
 
@@ -710,6 +714,21 @@
 
     <div class="updated" id="updated"></div>
     </div><!-- end tab-2 -->
+
+    <div id="tab-3" style="display:none">
+      <div style="text-align:center;padding:40px 16px;">
+        <div style="font-size:48px;margin-bottom:16px;">🔧</div>
+        <div style="font-size:20px;font-weight:800;color:#1a4a9e;margin-bottom:8px;">สถานีทวนสัญญาณ E24BL</div>
+        <div style="font-size:14px;color:#666;margin-bottom:20px;">อยู่ระหว่างการดำเนินการ</div>
+        <div style="display:inline-block;background:linear-gradient(135deg,#fff3cd,#ffe082);border:2px solid #FFD700;border-radius:12px;padding:16px 24px;max-width:400px;">
+          <div style="font-size:13px;color:#7a5f00;line-height:1.7;">
+            🏗️ ขณะนี้กำลังติดตั้งระบบสถานีทวนสัญญาณชุดที่ 2<br>
+            ข้อมูลและสถานะจะแสดงที่นี่เมื่อระบบพร้อมใช้งาน<br><br>
+            <span style="font-weight:700;">ติดตามความคืบหน้าได้ที่กลุ่มสมาคม</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- end tab-3 -->
 
   </div>
 
@@ -1379,14 +1398,12 @@ function toggleCard(card) {
 }
 
 function switchTab(n) {
-  document.getElementById('tab-1').style.display = n === 1 ? '' : 'none';
-  document.getElementById('tab-2').style.display = n === 2 ? '' : 'none';
-  var b1 = document.getElementById('tab-btn-1');
-  var b2 = document.getElementById('tab-btn-2');
-  b1.style.color = n === 1 ? '#1a4a9e' : '#aaa';
-  b1.style.borderBottom = n === 1 ? '3px solid #1a4a9e' : '3px solid transparent';
-  b2.style.color = n === 2 ? '#1a4a9e' : '#aaa';
-  b2.style.borderBottom = n === 2 ? '3px solid #1a4a9e' : '3px solid transparent';
+  [1,2,3].forEach(function(i) {
+    document.getElementById('tab-' + i).style.display = n === i ? '' : 'none';
+    var b = document.getElementById('tab-btn-' + i);
+    b.style.color = n === i ? '#1a4a9e' : '#aaa';
+    b.style.borderBottom = n === i ? '3px solid #1a4a9e' : '3px solid transparent';
+  });
 }
 </script>
 </body>
