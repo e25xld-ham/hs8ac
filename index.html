@@ -1048,8 +1048,9 @@ function renderPower(s, upd) {
   // Battery 2: % จากแรงดันวัดจริง — พักเต็ม 13.8V = 100% (ขณะชาร์จขึ้นถึง 14.4V ก็ 100%), 13.1V = 61%
   // โหลด D-STAR สะท้อนอยู่ในแรงดันจริงแล้ว ไม่ต้องหักโมเดลซ้ำ
   let pct2 = 100;
-  if (s.mppt && s.mppt.bat_v != null) {
-    pct2 = Math.max(0, Math.min(100, 58 + (s.mppt.bat_v - 13.0) * 52.5));
+  let bat2_v = (s.mppt && s.mppt.bat_v != null) ? s.mppt.bat_v : (s.bat2_manual ? s.bat2_manual.v : null);
+  if (bat2_v != null) {
+    pct2 = Math.max(0, Math.min(100, 58 + (bat2_v - 13.0) * 52.5));
   } else if (act2) {
     pct2 = 100 * Math.max(0, usable2 - analogUsed) / usable2;
   }
