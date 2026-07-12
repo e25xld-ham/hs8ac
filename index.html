@@ -1290,7 +1290,7 @@ function renderUsage(u) {
 
 async function loadStatus() {
   try {
-    const res = await fetch('https://e25xld-ham.github.io/dvswitch-manual/status.json?t=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch('https://e25xld-ham.github.io/hs8ac/status.json?t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('http ' + res.status);
     const s = await res.json();
 
