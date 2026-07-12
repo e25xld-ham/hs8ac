@@ -1,7 +1,7 @@
 {
   "node": "620540",
   "online": true,
-  "uptime": "10:39:03",
+  "uptime": "10:39:05",
   "asl_users": 45,
   "active_count": 0,
   "active_users": [],
@@ -17,6 +17,6 @@
   "mppt": null,
   "bat1_manual": {"v": 13.5, "t": 1783848892},
   "live_url": "https://leslie-translated-hong-jacob.trycloudflare.com",
-  "updated": "2026-07-13T03:20:05+07:00",
+  "updated": "2026-07-13T03:20:06+07:00",
   "updated_display": "13/07/2026 03:20 น."
 }
