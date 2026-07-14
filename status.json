@@ -1,7 +1,7 @@
 {
   "node": "620540",
   "online": true,
-  "uptime": "41:50:05",
+  "uptime": "42:00:05",
   "asl_users": 46,
   "active_count": 0,
   "active_users": [],
@@ -18,6 +18,6 @@
   "bat1_manual": {"v": 13.2, "t": 1783888077},
   "bat2_manual": {"v": 13.2, "a": 9.0, "t": 1783888300},
   "live_url": "https://lance-phentermine-ferry-suse.trycloudflare.com",
-  "updated": "2026-07-14T23:10:04+07:00",
-  "updated_display": "14/07/2026 23:10 น."
+  "updated": "2026-07-14T23:20:04+07:00",
+  "updated_display": "14/07/2026 23:20 น."
 }
