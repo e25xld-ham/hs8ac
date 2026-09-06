@@ -1,128 +1,128 @@
-# Development Roadmap
+# แผนพัฒนา HS8AC ARDF ePunch
 
-## Phase 0 — Definition
+## Phase 0 — กำหนดแนวคิดและขอบเขต
 
-Status: **in progress**
+สถานะ: **กำลังดำเนินการ**
 
-- Define system goals
-- Define offline-first requirement
-- Define Start / Fox / Finish station roles
-- Define athlete tag concept
-- Select Prototype V1 hardware family
-- Publish architecture and project origin
+- กำหนดเป้าหมายของระบบ
+- กำหนดหลักการ Offline-first
+- กำหนดบทบาทของสถานี START / FOX / FINISH
+- กำหนดแนวคิดแท็กประจำตัวนักกีฬา
+- เลือกตระกูล Hardware สำหรับ Prototype V1
+- เผยแพร่สถาปัตยกรรมและที่มาของโครงการ
 
-## Phase 1 — Bench Prototype
+## Phase 1 — Prototype บนโต๊ะ
 
-Target hardware:
+Hardware เป้าหมาย:
 
 - LILYGO T-A7670G R2
-- PN532 NFC reader
+- PN532 NFC Reader
 - DS3231 RTC
 - microSD
-- 10 passive NFC/RFID tags
-- buzzer + LEDs
+- Passive NFC/RFID Tag 10 ชิ้น
+- Buzzer + LEDs
 
-Milestones:
+Milestone:
 
-1. ESP32 boots reliably
-2. firmware uploads from development computer
-3. reader detects 10/10 test tags repeatedly
-4. RTC is readable and configurable
-5. local punch event is written persistently
-6. local success feedback works
-7. reboot does not lose queued punches
-8. LTE connection works with Thai mobile SIM
-9. authenticated test event reaches HS8AC backend
+1. ESP32 เปิดทำงานได้เสถียร
+2. อัปโหลด Firmware จากคอมพิวเตอร์ได้
+3. Reader ตรวจพบ Tag ทดสอบครบ 10/10 ซ้ำ ๆ ได้
+4. อ่านและตั้งค่า RTC ได้
+5. บันทึก Punch ลง Local Storage แบบถาวรได้
+6. LED/Buzzer ยืนยัน Punch ได้
+7. Restart แล้ว Punch ที่ยังไม่ Sync ต้องไม่หาย
+8. LTE ใช้งานกับ SIM ของเครือข่ายมือถือในประเทศไทยได้
+9. Test Event ที่ผ่าน Authentication ส่งถึง HS8AC Backend ได้
 
-## Phase 2 — Offline Queue Validation
+## Phase 2 — ทดสอบ Offline Queue
 
-Tests:
+การทดสอบ:
 
-- remove SIM and punch several tags
-- disable LTE during punches
-- reboot with unsynced events
-- restore LTE and verify complete replay
-- intentionally duplicate network delivery
-- verify server idempotency
-- verify no locally accepted punch disappears
+- ถอด SIM แล้ว Punch หลาย Tag
+- ปิด LTE ระหว่างการ Punch
+- Restart เครื่องขณะที่ยังมี Event ไม่ได้ Sync
+- เปิด LTE กลับมาและตรวจว่าข้อมูลถูกส่งย้อนหลังครบ
+- จงใจส่ง Network Event ซ้ำ
+- ตรวจ Server Idempotency
+- ตรวจว่า Punch ที่เครื่องยืนยันแล้วไม่มีรายการใดหาย
 
-Acceptance condition:
+เงื่อนไขผ่าน:
 
-**Every locally confirmed test punch must remain recoverable after network loss and restart.**
+**Punch ทดสอบทุกครั้งที่เครื่องยืนยันสำเร็จ ต้องสามารถกู้คืนได้หลัง Network หลุดและ Restart**
 
-## Phase 3 — Start + Fox 1 Field Prototype
+## Phase 3 — Prototype ภาคสนาม START + FOX 1
 
-Deploy two independent stations:
+นำ Reader อิสระ 2 เครื่องไปใช้งาน:
 
 - CP-START
 - CP-F01
 
-Use approximately 10 athlete tags.
+ใช้ Tag นักกีฬาประมาณ 10 ชิ้น
 
-Measure:
+วัดและทดสอบ:
 
-- tag reading speed
-- usability while running
-- accidental/double touch behavior
-- LTE performance
-- battery endurance
-- clock drift
-- outdoor heat/humidity behavior
-- recovery from poor cellular signal
+- ความเร็วในการอ่าน Tag
+- ความสะดวกขณะนักกีฬากำลังวิ่ง
+- พฤติกรรมจากการแตะซ้ำ/แตะโดยไม่ตั้งใจ
+- ประสิทธิภาพ LTE
+- อายุการใช้งานแบตเตอรี่
+- Clock Drift
+- การทำงานกลางแจ้งในสภาพร้อน/ชื้น
+- การกู้การเชื่อมต่อเมื่อสัญญาณมือถือไม่ดี
 
 ## Phase 4 — HS8AC Cloud + Live Dashboard
 
-Integrate with `ardf.hs8ac.com`.
+เชื่อมเข้ากับ `ardf.hs8ac.com`
 
-Officials should see:
+กรรมการควรเห็น:
 
-- athlete registration/tag mapping
-- live start events
-- live Fox 1 events
-- latest punch feed
-- preliminary elapsed time
-- device online/offline state
-- signal/battery status
-- delayed sync markers
-- audit/event logs
+- การลงทะเบียนนักกีฬาและการจับคู่ Tag
+- Start Event แบบสด
+- FOX 1 Event แบบสด
+- Feed ของ Punch ล่าสุด
+- เวลารวมเบื้องต้น
+- สถานะ Online/Offline ของ Device
+- สัญญาณ LTE/สถานะแบตเตอรี่
+- เครื่องหมาย Punch ที่ Sync ย้อนหลัง
+- Audit/Event Logs
 
-## Phase 5 — Engineering Hardening
+## Phase 5 — ปรับระบบให้พร้อมใช้งานจริง
 
-After successful field prototype:
+หลัง Prototype ภาคสนามผ่าน:
 
-- review PN532 vs newer production NFC reader options
-- finalize electrical design
-- define production connectors
-- improve surge/ESD/power protection
-- improve battery system
-- design waterproof enclosure
-- design maintenance/service procedure
-- define firmware update process
-- define device provisioning/key rotation
+- ทบทวน PN532 เทียบกับ NFC Reader รุ่นใหม่สำหรับ Production
+- สรุป Electrical Design
+- กำหนด Connector สำหรับ Production
+- เพิ่ม Surge/ESD/Power Protection
+- ปรับปรุงระบบแบตเตอรี่
+- ออกแบบกล่องกันน้ำ
+- ออกแบบขั้นตอนบำรุงรักษาและซ่อม
+- กำหนดกระบวนการ Update Firmware
+- กำหนด Device Provisioning และ Key Rotation
 
 ## Phase 6 — Custom PCB
 
-Only after pin assignments, power design and firmware interfaces are stable.
+เริ่มขั้นนี้เมื่อ Pin Assignment, Power Design และ Firmware Interface คงที่แล้วเท่านั้น
 
-Goals:
+เป้าหมาย:
 
-- reduce loose wiring
-- reduce assembly mistakes
-- standardize every station
-- simplify repair
-- document test points
-- create repeatable HS8AC hardware revision numbers
+- ลดสายต่อหลวม
+- ลดความผิดพลาดในการประกอบ
+- ทำให้ทุกสถานีเป็นมาตรฐานเดียวกัน
+- ซ่อมง่ายขึ้น
+- ระบุ Test Point ชัดเจน
+- มีหมายเลข Hardware Revision ของ HS8AC ที่ตรวจสอบย้อนหลังได้
 
-Example revision naming:
+ตัวอย่างชื่อ Revision:
 
 ```text
 HS8AC-EPUNCH-READER Rev.A
 HS8AC-EPUNCH-READER Rev.B
 ```
 
-## Phase 7 — Full Competition Set
+## Phase 7 — ชุดการแข่งขันเต็มระบบ
 
-Build seven independently configured stations:
+สร้างสถานีอิสระทั้งหมด 7 เครื่อง:
 
 ```text
 START
@@ -134,25 +134,25 @@ FOX 5
 FINISH
 ```
 
-Run simulated and real-course validation before any official scoring dependency.
+ต้องผ่านทั้งการจำลองการแข่งขันและการทดสอบบนสนามจริง ก่อนนำไปเป็นระบบหลักในการตัดสินผลอย่างเป็นทางการ
 
-## Phase 8 — Documentation and Reproducibility
+## Phase 8 — เอกสารและการทำซ้ำระบบ
 
-Publish enough documentation for another amateur-radio team to reproduce the platform safely:
+เผยแพร่เอกสารให้ทีมวิทยุสมัครเล่นอื่นสามารถสร้างระบบตามได้อย่างปลอดภัย ได้แก่:
 
 - BOM
-- wiring diagrams
-- pinout tables
-- firmware build instructions
-- server/API specification
-- deployment guide
-- field setup checklist
-- competition-day checklist
-- troubleshooting guide
-- test procedures
+- Wiring Diagram
+- Pinout Table
+- คู่มือ Build Firmware
+- Server/API Specification
+- Deployment Guide
+- Checklist ก่อนติดตั้งภาคสนาม
+- Checklist วันแข่งขัน
+- Troubleshooting Guide
+- Test Procedure
 
-Sensitive credentials and production secrets must not be published.
+ข้อมูล Credential และ Secret ของ Production ต้องไม่ถูกเผยแพร่
 
-## Long-term Direction
+## ทิศทางระยะยาว
 
-The long-term objective is a practical, low-cost ARDF electronic punching platform originating from HS8AC in Thailand, capable of being adapted by other associations without requiring expensive proprietary timing infrastructure.
+เป้าหมายระยะยาวคือสร้างแพลตฟอร์ม Electronic Punching สำหรับ ARDF ที่ใช้งานจริงได้ ราคาประหยัด มีต้นกำเนิดจาก HS8AC ประเทศไทย และสามารถนำไปปรับใช้โดยสมาคมอื่นได้ โดยไม่ต้องพึ่งระบบจับเวลาแบบ Proprietary ที่มีราคาสูง
