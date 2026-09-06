@@ -1,25 +1,25 @@
-# System Architecture
+# สถาปัตยกรรมระบบ HS8AC ARDF ePunch
 
-## End-to-end topology
+## ภาพรวมการเชื่อมต่อ End-to-End
 
 ```mermaid
 flowchart LR
-    TAG[Passive NFC/RFID athlete tag]
+    TAG[แท็ก NFC/RFID แบบ Passive ของนักกีฬา]
 
-    subgraph FIELD[Field station]
-      NFC[PN532-class NFC reader]
-      ESP[ESP32 controller]
+    subgraph FIELD[สถานีภาคสนาม]
+      NFC[PN532-class NFC Reader]
+      ESP[ESP32 Controller]
       RTC[DS3231 RTC]
-      STORE[Local storage]
-      IO[LED + buzzer]
-      LTE[4G LTE modem]
+      STORE[Local Storage]
+      IO[LED + Buzzer]
+      LTE[4G LTE Modem]
     end
 
     subgraph CLOUD[HS8AC Cloud]
       API[Punch API]
-      DB[(Competition database)]
-      LIVE[Live event service]
-      HEALTH[Device health service]
+      DB[(ฐานข้อมูลการแข่งขัน)]
+      LIVE[บริการ Live Event]
+      HEALTH[บริการ Device Health]
     end
 
     WEB[ardf.hs8ac.com]
@@ -36,9 +36,9 @@ flowchart LR
     HEALTH --> WEB
 ```
 
-## Field station roles
+## บทบาทของสถานีภาคสนาม
 
-All field modules use the same general hardware/firmware platform. Their behavior is determined by configuration.
+ทุกสถานีใช้แพลตฟอร์ม Hardware/Firmware หลักแบบเดียวกัน แล้วกำหนดบทบาทด้วย Configuration
 
 ```text
 CP-START
@@ -50,121 +50,121 @@ CP-F05
 CP-FINISH
 ```
 
-This avoids maintaining seven unrelated firmware builds.
+แนวทางนี้ช่วยให้เราไม่ต้องดูแล Firmware แยกกันถึง 7 ชุด
 
-## Required punch lifecycle
+## วงจรชีวิตของ Punch ที่ระบบต้องทำ
 
-A punch event is not considered safely captured until it exists in persistent local storage.
+Punch จะยังไม่ถือว่าถูกเก็บอย่างปลอดภัยจนกว่าจะถูกเขียนลง Persistent Local Storage สำเร็จ
 
 ```text
-1. Detect NFC tag
-2. Read UID
-3. Read RTC time
-4. Create unique local event ID
-5. Save event to persistent local storage
-6. Confirm locally with LED/buzzer
-7. Attempt upload
-8. Validate server ACK
-9. Mark local event as synchronized
+1. ตรวจพบ NFC Tag
+2. อ่าน UID
+3. อ่านเวลาจาก RTC
+4. สร้าง Event ID ที่ไม่ซ้ำ
+5. บันทึก Event ลง Persistent Local Storage
+6. แจ้งนักกีฬาด้วย LED/Buzzer
+7. พยายาม Upload
+8. ตรวจสอบ Server ACK
+9. ทำเครื่องหมาย Local Event ว่า Sync แล้ว
 ```
 
-If step 7 or 8 fails, the event remains queued.
+ถ้าขั้นตอน 7 หรือ 8 ล้มเหลว Event ต้องคงอยู่ใน Queue เพื่อส่งใหม่ภายหลัง
 
-## Offline behavior
+## การทำงานเมื่อ Offline
 
 ```mermaid
 stateDiagram-v2
     [*] --> Ready
-    Ready --> Captured: Tag detected
-    Captured --> Stored: Write local event
-    Stored --> Uploading: LTE available
-    Stored --> Queued: LTE unavailable
-    Uploading --> Synced: Valid server ACK
-    Uploading --> Queued: Timeout / error
-    Queued --> Uploading: Retry later
+    Ready --> Captured: ตรวจพบ Tag
+    Captured --> Stored: บันทึก Local Event
+    Stored --> Uploading: LTE ใช้งานได้
+    Stored --> Queued: LTE ใช้งานไม่ได้
+    Uploading --> Synced: ได้รับ Server ACK ที่ถูกต้อง
+    Uploading --> Queued: Timeout / Error
+    Queued --> Uploading: Retry ภายหลัง
     Synced --> Ready
 ```
 
-The athlete should receive successful punch feedback after **local durable storage**, not after waiting for the Internet.
+นักกีฬาควรได้รับสัญญาณ Punch สำเร็จหลังจาก **บันทึกข้อมูลลง Local Storage แบบถาวรแล้ว** ไม่ใช่หลังจากรอ Internet ตอบกลับ
 
-## Event identity
+## ตัวตนของ Event
 
-Each event should carry enough information to distinguish legitimate retransmission from duplicate athlete actions.
+Event แต่ละรายการควรมีข้อมูลเพียงพอที่จะแยก Network Retransmission ออกจากการที่นักกีฬาแตะซ้ำจริง
 
-Suggested fields:
+แนะนำ Fields:
 
 ```text
-event_id        UUID or device-based unique ID
-competition_id  e.g. CHUMPHON_ARDF_2026
-device_id       e.g. CP-F03
+event_id        UUID หรือ Unique ID ที่สร้างจาก Device
+competition_id  เช่น CHUMPHON_ARDF_2026
+device_id       เช่น CP-F03
 station_role    START / FOX / FINISH
-station_number  0..5 where applicable
-tag_uid         raw/normalized NFC UID
-punch_time      local RTC timestamp
-sequence        monotonic device sequence number
-firmware        firmware version
-battery         optional battery telemetry
-rssi            LTE signal strength when upload occurs
-signature       message authentication value
+station_number  0..5 ตามความเหมาะสม
+tag_uid         UID ของ NFC แบบ Raw/Normalized
+punch_time      เวลา RTC ขณะอ่านแท็ก
+sequence        Sequence Number ของ Device ที่เพิ่มขึ้นเรื่อย ๆ
+firmware        เวอร์ชัน Firmware
+battery         ค่า Battery Telemetry (ถ้ามี)
+rssi            ความแรงสัญญาณ LTE ตอน Upload
+signature       ค่าตรวจสอบความถูกต้องของข้อความ
 ```
 
-## Duplicate handling
+## การจัดการข้อมูลซ้ำ
 
-There are two different duplicate cases and they should not be confused.
+ข้อมูลซ้ำมี 2 กรณีที่ต้องแยกออกจากกัน
 
-### Network retransmission
+### Network Retransmission
 
-The same `event_id` may be uploaded several times because the field station did not receive an ACK. The server should store it once and return a valid ACK for repeated delivery.
+`event_id` เดิมอาจถูก Upload หลายครั้ง เพราะ Reader ไม่ได้รับ ACK จาก Server ระบบ Server ต้องเก็บเพียงครั้งเดียว และตอบ ACK กลับอย่างถูกต้องแม้ได้รับข้อมูลเดิมซ้ำ
 
-### Athlete repeats a punch
+### นักกีฬา Punch ซ้ำ
 
-The athlete may physically touch the same FOX several times. These are separate captures with separate event IDs. Competition rules can decide whether the first valid punch, last punch or another policy is used for scoring.
+นักกีฬาอาจแตะ FOX เดิมมากกว่าหนึ่งครั้ง การแตะแต่ละครั้งเป็นคนละ Capture และต้องมี Event ID แยกกัน กติกาการแข่งขันค่อยกำหนดว่าจะใช้ Punch แรก Punch ล่าสุด หรือ Policy อื่นในการคิดผล
 
-The raw event history should not be silently deleted.
+Raw Event History ต้องไม่ถูกลบทิ้งแบบเงียบ ๆ
 
-## Time synchronization
+## การซิงก์เวลา
 
-Primary competition timing is based on the reader RTC at capture time.
+เวลาหลักของการแข่งขันอ้างอิง RTC ใน Reader ณ เวลาที่อ่าน Tag
 
-Before a competition, all field modules must undergo a time synchronization/check procedure. Future revisions may use GNSS and/or network time as calibration sources, but an Internet connection at punch time must not be required.
+ก่อนการแข่งขัน Reader ทุกเครื่องต้องผ่านขั้นตอนตรวจสอบและซิงก์เวลาให้ตรงกัน ในอนาคตอาจใช้ GNSS และ/หรือ Network Time เป็นแหล่ง Calibration เพิ่มเติม แต่การ Punch ต้องไม่จำเป็นต้องมี Internet ในขณะนั้น
 
-## Security model
+## Security Model
 
-Each field device should have an independent secret/key. A compromised FOX credential should not automatically authorize another FOX.
+Reader แต่ละเครื่องควรมี Secret/Key ของตัวเอง หาก Credential ของ FOX เครื่องหนึ่งรั่ว จะต้องไม่ทำให้สามารถปลอมตัวเป็น FOX เครื่องอื่นได้โดยอัตโนมัติ
 
-Minimum server checks:
+Server ต้องตรวจอย่างน้อย:
 
-1. known competition ID
-2. known device ID
-3. valid message signature/authentication
-4. valid field structure
-5. plausible timestamp policy
-6. event ID idempotency
-7. sequence tracking / anomaly detection
+1. Competition ID ที่รู้จัก
+2. Device ID ที่รู้จัก
+3. Message Signature/Authentication ถูกต้อง
+4. โครงสร้าง Field ถูกต้อง
+5. Timestamp ผ่าน Policy ที่กำหนด
+6. Event ID รองรับ Idempotency
+7. ติดตาม Sequence เพื่อค้นหาความผิดปกติ
 
-Secrets must never be committed to the public GitHub repository.
+**ห้ามนำ Secret หรือ Production Credential ใส่ไว้ใน Public GitHub Repository**
 
-## Cloud responsibilities
+## หน้าที่ของ Cloud
 
-The cloud must not invent official field timestamps. Its responsibilities are:
+Cloud ห้ามสร้างหรือแก้ Official Field Timestamp เอง หน้าที่หลักคือ:
 
-- authenticated event ingestion
-- durable storage
-- deduplication/idempotency
-- live result projection
-- athlete progress calculation
-- device health monitoring
-- operator audit logs
-- delayed/offline event reconciliation
+- รับ Event ที่ผ่าน Authentication
+- เก็บข้อมูลอย่างถาวร
+- Deduplication / Idempotency
+- สร้าง Live Result
+- คำนวณความคืบหน้าของนักกีฬา
+- ตรวจสุขภาพ Device
+- เก็บ Operator Audit Log
+- รวมและตรวจสอบ Event ที่ส่งย้อนหลังหลัง Offline
 
-## Live dashboard responsibilities
+## หน้าที่ของ Live Dashboard
 
-The officials' dashboard should distinguish between:
+Dashboard สำหรับกรรมการควรแยกสถานะให้เห็นชัดระหว่าง:
 
-- live synchronized punches
-- delayed punches received from offline queue
-- device offline state
-- pending/unknown device queue state
-- invalid/rejected uploads
+- Punch ที่ Sync แบบสด
+- Punch ที่ส่งย้อนหลังจาก Offline Queue
+- Device ที่ Offline
+- สถานะ Queue ที่ยังไม่ทราบหรือ Pending
+- Upload ที่ไม่ถูกต้องหรือถูก Reject
 
-This prevents a temporary mobile-network failure from being confused with a missing athlete punch.
+การแยกสถานะเหล่านี้จะช่วยให้ปัญหาเครือข่ายมือถือชั่วคราวไม่ถูกเข้าใจผิดว่าเป็นการที่นักกีฬาพลาด Punch
