@@ -1,75 +1,73 @@
-# Prototype V1 — Bill of Materials (BOM)
+# Prototype V1 — รายการอุปกรณ์ (BOM)
 
-This BOM is intentionally limited to one bench prototype set. Do **not** buy seven complete stations yet.
+รายการนี้ตั้งใจให้เป็นเพียงชุด Prototype บนโต๊ะ 1 ชุดก่อน **ยังไม่ควรซื้อครบ 7 สถานีในตอนนี้**
 
-## Core electronics
+## อุปกรณ์อิเล็กทรอนิกส์หลัก
 
-| Item | Qty | Purpose | Notes |
+| รายการ | จำนวน | หน้าที่ | หมายเหตุ |
 |---|---:|---|---|
-| LILYGO T-A7670G R2 | 1 | ESP32 + 4G LTE controller | Preferred prototype controller |
-| PN532 NFC module | 1 | Athlete tag reader | Prototype V1 reader |
-| DS3231 RTC module | 1 | Local competition timestamp | Use battery-backed RTC |
-| CR2032 cell | 1 | RTC backup battery | Check correct module battery support |
-| microSD 16–32 GB | 1 | Local punch/event storage | High-endurance card preferred later |
-| Passive NFC/RFID tags, 13.56 MHz, ISO14443A | 10 | Athlete tags | Use inexpensive generic tags for testing |
-| Active buzzer, 3.3 V compatible | 2 | Audible punch feedback | One spare |
-| Green 5 mm LEDs | 3 | Successful punch / status | One used initially |
-| Red 5 mm LEDs | 3 | Fault / reject indication | One used initially |
-| 220–330 ohm resistors | 10 | LED current limiting | Required with LEDs |
+| LILYGO T-A7670G R2 | 1 | Controller ESP32 + 4G LTE | บอร์ดหลักที่เลือกใช้สำหรับ Prototype |
+| PN532 NFC Module | 1 | อ่านแท็กนักกีฬา | Reader สำหรับ Prototype V1 |
+| DS3231 RTC Module | 1 | เก็บเวลาการแข่งขันภายในเครื่อง | ใช้ RTC ที่มีแบตเตอรี่สำรอง |
+| CR2032 | 1 | แบตสำรอง RTC | ตรวจสอบความเข้ากันได้กับโมดูลก่อนใช้ |
+| microSD 16–32 GB | 1 | เก็บ Punch/Event ภายในเครื่อง | รุ่นใช้งานจริงอาจใช้ High-Endurance |
+| Passive NFC/RFID Tag 13.56 MHz, ISO14443A | 10 | แท็กนักกีฬา | Prototype ใช้แท็กราคาประหยัดก่อน |
+| Active Buzzer รองรับ 3.3 V | 2 | เสียงยืนยัน Punch | 1 ตัวใช้จริง + 1 ตัวสำรอง |
+| LED เขียว 5 mm | 3 | แสดง Punch สำเร็จ/สถานะ | เริ่มต้นใช้ 1 ตัว |
+| LED แดง 5 mm | 3 | แจ้ง Error/Reject | เริ่มต้นใช้ 1 ตัว |
+| Resistor 220–330 ohm | 10 | จำกัดกระแส LED | ต้องใช้ร่วมกับ LED |
 
-## Prototyping accessories
+## อุปกรณ์สำหรับทำ Prototype
 
-| Item | Qty | Purpose |
+| รายการ | จำนวน | หน้าที่ |
 |---|---:|---|
-| Medium breadboard | 1 | Solderless prototype wiring |
-| Dupont male-to-male wire set | 1 | Breadboard connections |
-| Dupont male-to-female wire set | 1 | Module connections |
-| USB-C data cable | 1 | Programming and bench power |
-| Nano-SIM with mobile data | 1 | LTE testing |
-| USB power bank | 1 | Portable test power |
-| Digital multimeter | 1 | Voltage, continuity and short-circuit checks |
+| Breadboard ขนาดกลาง | 1 | ทดลองต่อวงจรโดยไม่ต้องบัดกรี |
+| ชุดสาย Dupont Male-to-Male | 1 | ต่อบน Breadboard |
+| ชุดสาย Dupont Male-to-Female | 1 | ต่อโมดูลต่าง ๆ |
+| สาย USB-C Data | 1 | โปรแกรมบอร์ดและจ่ายไฟขณะทดสอบ |
+| Nano-SIM ที่มี Mobile Data | 1 | ทดสอบ LTE |
+| USB Power Bank | 1 | จ่ายไฟแบบพกพา |
+| Digital Multimeter | 1 | วัดแรงดัน ตรวจ Continuity และตรวจ Short Circuit |
 
-## Tools for later permanent assembly
+## เครื่องมือสำหรับประกอบแบบถาวรในภายหลัง
 
-These are not required for the first no-solder bench test, but will be needed later:
+ช่วงทดลองแบบไม่บัดกรียังไม่จำเป็นต้องใช้ แต่ในอนาคตควรมี:
 
-- temperature-controlled soldering iron, approximately 40–60 W
-- electronics solder
-- flux
-- soldering stand
-- side cutters
-- wire stripper
-- small screwdrivers
-- heat-shrink tubing
-- helping-hands / PCB holder
+- หัวแร้งปรับอุณหภูมิได้ประมาณ 40–60 W
+- ตะกั่วบัดกรีสำหรับงานอิเล็กทรอนิกส์
+- Flux
+- ที่วางหัวแร้ง
+- คีมตัดสาย
+- คีมปอกสาย
+- ไขควงขนาดเล็ก
+- Heat-shrink Tube
+- Helping Hands / PCB Holder
 
-## Do not buy yet
+## ของที่ยังไม่ควรซื้อ
 
-Wait until Prototype V1 passes bench and field tests before purchasing:
+รอให้ Prototype V1 ผ่านการทดสอบบนโต๊ะและภาคสนามก่อน แล้วจึงค่อยซื้อ:
 
-- all seven controller boards
-- custom PCB
-- waterproof competition enclosure
-- large battery packs
-- custom athlete tags
-- external LTE antennas beyond what is needed for initial testing
-- production cabling/connectors
+- บอร์ด Controller ครบทั้ง 7 สถานี
+- Custom PCB
+- กล่องกันน้ำสำหรับใช้งานจริง
+- แบตเตอรี่ขนาดใหญ่
+- แท็กนักกีฬาแบบสั่งทำพิเศษ
+- เสา LTE ภายนอกเพิ่มเติมที่ยังไม่จำเป็นในช่วงทดลอง
+- สายและ Connector แบบ Production
 
-## Procurement rule
+## กติกาก่อนสั่งซื้อ
 
-Before purchasing a board or module that has multiple revisions, verify the exact product photo/model/revision. Similar product names can have different LTE modems, pinouts or voltage requirements.
+อุปกรณ์หรือบอร์ดที่มีหลาย Revision ต้องตรวจสอบรูปสินค้า ชื่อรุ่น และ Revision ให้ตรงก่อนซื้อ เพราะสินค้าที่ชื่อคล้ายกันอาจใช้ LTE Modem, Pinout หรือแรงดันไฟคนละแบบ
 
-## Prototype target
-
-The first hardware milestone is:
+## เป้าหมายของ Prototype ชุดแรก
 
 ```text
-ESP32 boots
- -> computer can upload firmware
- -> NFC tag UID is read
- -> RTC timestamp is read
- -> event is written locally
- -> buzzer/LED confirms punch
- -> LTE connects
- -> event reaches HS8AC server
+ESP32 เปิดติด
+ -> คอมพิวเตอร์อัปโหลด Firmware ได้
+ -> อ่าน UID ของ NFC Tag ได้
+ -> อ่านเวลา RTC ได้
+ -> บันทึก Event ลง Local Storage ได้
+ -> Buzzer/LED ยืนยัน Punch ได้
+ -> LTE เชื่อมต่อได้
+ -> Event ส่งถึง HS8AC Server ได้
 ```
