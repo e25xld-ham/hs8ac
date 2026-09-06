@@ -1,28 +1,28 @@
 # HS8AC ARDF ePunch
 
-> Low-cost, offline-first electronic punching and real-time competition monitoring for Amateur Radio Direction Finding (ARDF), initiated by HS8AC / E25XLD in Thailand.
+> ระบบบันทึกจุดอิเล็กทรอนิกส์ราคาประหยัดสำหรับการแข่งขัน Amateur Radio Direction Finding (ARDF) ออกแบบให้ทำงานแบบ Offline-first และรายงานผลแบบเรียลไทม์ โดยริเริ่มจาก HS8AC / E25XLD ประเทศไทย
 
-## Vision
+## วิสัยทัศน์
 
-HS8AC ARDF ePunch is an original low-cost modernization project for ARDF competition in Thailand. The goal is to replace manual paper punching/stamping with a reliable electronic system that amateur-radio associations can build, maintain and expand themselves.
+HS8AC ARDF ePunch เป็นโครงการพัฒนาระบบอิเล็กทรอนิกส์ราคาประหยัดเพื่อยกระดับการแข่งขัน ARDF ในประเทศไทย เป้าหมายคือเปลี่ยนจากการเจาะบัตรหรือประทับตราบนกระดาษแบบเดิม ไปสู่ระบบอิเล็กทรอนิกส์ที่สมาคมวิทยุสมัครเล่นสามารถประกอบ ดูแล ซ่อม และต่อยอดได้เอง
 
-The system is designed around one key principle:
+หลักการสำคัญที่สุดของระบบคือ:
 
-**The field station must keep working even when the Internet does not.**
+**สถานีภาคสนามต้องทำงานต่อได้ แม้อินเทอร์เน็ตจะใช้งานไม่ได้**
 
-Real-time cloud reporting is an enhancement, not a dependency for recording a valid punch.
+การรายงานผลขึ้น Cloud แบบเรียลไทม์เป็นความสามารถเพิ่มเติม ไม่ใช่เงื่อนไขที่ทำให้ Punch ถูกบันทึกหรือไม่
 
 ## Prototype V1
 
-The first prototype uses only:
+Prototype รุ่นแรกจะใช้เพียง:
 
-- 1 × START station
-- 1 × FOX 1 station
-- approximately 10 athlete NFC/RFID tags
-- HS8AC cloud backend
-- live monitoring at `ardf.hs8ac.com`
+- 1 × สถานี START
+- 1 × สถานี FOX 1
+- แท็ก NFC/RFID สำหรับนักกีฬาประมาณ 10 ชิ้น
+- HS8AC Cloud Backend
+- ระบบติดตามผลแบบสดที่ `ardf.hs8ac.com`
 
-After field testing, the system can expand to:
+เมื่อผ่านการทดสอบภาคสนามแล้ว ระบบสามารถขยายเป็น:
 
 - START
 - FOX 1
@@ -32,21 +32,21 @@ After field testing, the system can expand to:
 - FOX 5
 - FINISH
 
-Total: **7 independent stations**.
+รวมทั้งหมด **7 สถานีอิสระ**
 
-## Athlete Tag
+## แท็กของนักกีฬา
 
-Each athlete carries a passive 13.56 MHz NFC/RFID tag.
+นักกีฬาแต่ละคนจะได้รับ Passive NFC/RFID Tag ความถี่ 13.56 MHz
 
-The tag:
+คุณสมบัติของแท็ก:
 
-- has no battery
-- requires no charging
-- can be reused
-- can be made as a key-fob, wrist tag or competition badge
-- is mapped to an athlete ID in the competition database
+- ไม่มีแบตเตอรี่
+- ไม่ต้องชาร์จ
+- นำกลับมาใช้ซ้ำได้
+- ทำเป็นพวงกุญแจ สายรัดข้อมือ หรือป้ายประจำตัวนักกีฬาได้
+- UID ของแท็กจะถูกผูกกับข้อมูลนักกีฬาในฐานข้อมูลการแข่งขัน
 
-Example:
+ตัวอย่าง:
 
 ```text
 Athlete: A025
@@ -54,62 +54,62 @@ Callsign: HS8XYZ
 Tag UID: 04:A2:9C:72:D3:41:80
 ```
 
-## Field Reader Architecture
+## สถาปัตยกรรมของเครื่องอ่านภาคสนาม
 
-Each START / FOX / FINISH module is an independent reader.
+ทุกสถานี START / FOX / FINISH เป็น Reader ที่ทำงานเป็นอิสระจากกัน
 
-Prototype hardware target:
+ฮาร์ดแวร์เป้าหมายของ Prototype:
 
-- ESP32-based controller
-- 4G LTE modem
-- PN532-class NFC reader for Prototype V1
-- DS3231-class RTC
-- local storage (microSD / flash)
-- status LEDs
-- buzzer
-- battery power
+- Controller ที่ใช้ ESP32
+- โมเด็ม 4G LTE
+- PN532-class NFC Reader สำหรับ Prototype V1
+- RTC ระดับ DS3231
+- Local Storage (microSD / flash)
+- LED แสดงสถานะ
+- Buzzer
+- แบตเตอรี่
 
-Initial preferred integrated controller platform:
+แพลตฟอร์ม Controller ที่เลือกใช้เบื้องต้น:
 
 **LILYGO T-A7670G R2**
 
-This combines ESP32 + LTE + SIM support + microSD capability, reducing wiring and failure points compared with using a basic Arduino board plus multiple external modules.
+บอร์ดนี้รวม ESP32 + LTE + SIM + microSD ไว้ด้วยกัน ช่วยลดจำนวนสาย จุดเชื่อมต่อ และจุดเสีย เมื่อเทียบกับการใช้ Arduino พื้นฐานร่วมกับโมดูลหลายตัวแยกกัน
 
-## Punch Flow
+## ลำดับการ Punch
 
-The reader must record the event locally before attempting cloud upload.
+Reader ต้องบันทึกเหตุการณ์ลง Local Storage ให้สำเร็จก่อน แล้วจึงค่อยพยายามส่งขึ้น Cloud
 
 ```text
-Athlete tag
+แท็กนักกีฬา
     |
     v
-NFC reader detects UID
+NFC Reader ตรวจพบ UID
     |
     v
-Read local RTC timestamp
+อ่านเวลาจาก RTC ภายในเครื่อง
     |
     v
-Store punch locally FIRST
+บันทึก Punch ลง Local Storage ก่อน
     |
-    +--> Beep + green LED = accepted
+    +--> Beep + ไฟเขียว = รับ Punch สำเร็จ
     |
     v
-Attempt 4G upload
+พยายามส่งข้อมูลผ่าน 4G
     |
-    +--> Server ACK -> mark synced
+    +--> Server ACK -> ทำเครื่องหมายว่า Sync แล้ว
     |
-    +--> No network -> keep in retry queue
+    +--> ไม่มี Network -> เก็บไว้ใน Retry Queue
 ```
 
-A loss of 4G must **never** cause a punch to be lost.
+การที่ 4G หลุดจะต้อง **ไม่ทำให้ Punch หายเด็ดขาด**
 
-## Timekeeping Rule
+## กติกาเรื่องเวลา
 
-The official punch timestamp is the time at which the field reader detected the athlete tag.
+เวลาที่ถือเป็นเวลาจริงของ Punch คือเวลาที่ Reader ภาคสนามตรวจพบแท็กของนักกีฬา
 
-It must **not** use the time at which the server received the HTTP/MQTT message, because cellular latency can vary.
+ห้ามใช้เวลาที่ Server ได้รับ HTTP/MQTT เป็นเวลาหลัก เพราะ Cellular Network อาจมี Delay แตกต่างกันได้
 
-Example event:
+ตัวอย่าง Event:
 
 ```json
 {
@@ -124,25 +124,25 @@ Example event:
 }
 ```
 
-## Offline-First Reliability
+## ความทนทานแบบ Offline-first
 
-Each reader must support:
+Reader ทุกเครื่องต้องรองรับ:
 
-- local event storage
-- persistent sequence numbers
-- restart recovery
-- retry queue
-- duplicate detection
-- delayed upload after LTE returns
-- server acknowledgement
+- การเก็บ Event ภายในเครื่อง
+- Sequence Number แบบถาวร
+- การกู้สถานะหลัง Restart
+- Retry Queue
+- Duplicate Detection
+- อัปโหลดย้อนหลังเมื่อ LTE กลับมา
+- Server Acknowledgement
 
-The reader should remain usable while completely offline.
+Reader ต้องยังสามารถใช้งานได้แม้ Offline โดยสมบูรณ์
 
-## Device Identity and Security
+## Device Identity และ Security
 
-Every physical reader receives its own station identity and authentication secret.
+Reader แต่ละเครื่องจะมี Station Identity และ Secret สำหรับ Authentication ของตัวเอง
 
-Suggested station IDs:
+ตัวอย่าง Station ID:
 
 ```text
 CP-START
@@ -154,35 +154,35 @@ CP-F05
 CP-FINISH
 ```
 
-Uploads must be authenticated/signed so that arbitrary clients cannot submit fake punches.
+ข้อมูลที่อัปโหลดต้องมี Authentication/Signature เพื่อป้องกัน Client ที่ไม่ได้รับอนุญาตส่ง Punch ปลอมเข้าสู่ระบบ
 
-The backend must validate at least:
+Backend ต้องตรวจอย่างน้อย:
 
-- competition/event ID
-- device/station ID
-- event sequence number
-- timestamp
-- tag UID
-- message authentication/signature
-- duplicate event ID
+- Competition/Event ID
+- Device/Station ID
+- Event Sequence Number
+- Timestamp
+- Tag UID
+- Message Authentication/Signature
+- Duplicate Event ID
 
 ## Live Competition Dashboard
 
-Target: `ardf.hs8ac.com`
+เป้าหมาย: `ardf.hs8ac.com`
 
-Officials should eventually be able to see:
+กรรมการควรสามารถดูข้อมูลต่อไปนี้ได้:
 
-- athletes currently on course
-- latest punches
-- progress through FOX stations
-- start time
-- finish time
-- preliminary elapsed time
-- missing FOX stations
-- duplicate/repeated punches
-- delayed/offline-synced punches
+- นักกีฬาที่กำลังอยู่ในสนาม
+- Punch ล่าสุด
+- ความคืบหน้าผ่าน FOX แต่ละจุด
+- เวลา Start
+- เวลา Finish
+- เวลารวมเบื้องต้น
+- FOX ที่ยังขาด
+- Punch ซ้ำ
+- Punch ที่ Sync ย้อนหลังหลังจาก Offline
 
-Example:
+ตัวอย่าง:
 
 ```text
 ATHLETE   START   F1   F2   F3   F4   F5   FINISH
@@ -192,18 +192,18 @@ HS8BBB      OK    OK   --   OK   OK   --     --
 
 ## Device Health Dashboard
 
-Each station should periodically send a heartbeat containing operational status such as:
+ทุกสถานีควรส่ง Heartbeat เป็นระยะ โดยมีข้อมูลเช่น:
 
-- online/offline
-- LTE signal strength
-- battery voltage / percentage
-- local storage status
-- RTC status
-- firmware version
-- pending unsynced punch count
-- last heartbeat
+- Online/Offline
+- ความแรงสัญญาณ LTE
+- แรงดัน/เปอร์เซ็นต์แบตเตอรี่
+- สถานะ Local Storage
+- สถานะ RTC
+- Firmware Version
+- จำนวน Punch ที่ยังไม่ได้ Sync
+- เวลา Heartbeat ล่าสุด
 
-Example:
+ตัวอย่าง:
 
 ```text
 FOX 1   ONLINE    LTE -79 dBm   Battery 87%   Queue 0
@@ -211,47 +211,47 @@ FOX 2   ONLINE    LTE -91 dBm   Battery 76%   Queue 0
 FOX 3   OFFLINE   Last seen 3m  Battery 63%   Queue unknown
 ```
 
-## Prototype Development Order
+## ลำดับการพัฒนา Prototype
 
-1. Power and USB communication
-2. ESP32 firmware upload
-3. NFC tag reading
-4. RTC reading
-5. local punch storage
-6. LED/buzzer confirmation
-7. 4G network connection
-8. authenticated punch API
-9. offline queue + retry
-10. live web dashboard
-11. outdoor field test
-12. dedicated PCB / enclosure design
+1. ทดสอบไฟเลี้ยงและการสื่อสารผ่าน USB
+2. อัปโหลด Firmware เข้า ESP32
+3. อ่าน NFC Tag
+4. อ่าน RTC
+5. บันทึก Punch ลง Local Storage
+6. ทดสอบ LED/Buzzer
+7. เชื่อมต่อ 4G
+8. สร้าง Authenticated Punch API
+9. ทำ Offline Queue + Retry
+10. ทำ Live Web Dashboard
+11. ทดสอบภาคสนามจริง
+12. ออกแบบ PCB และกล่องใช้งานจริง
 
-## Design Philosophy
+## หลักการออกแบบ
 
-The project should remain:
+โครงการนี้ควรมีคุณสมบัติ:
 
-- low-cost
-- reproducible
-- modular
-- repairable locally
-- documented for beginners
-- independent of continuous Internet access
-- capable of growing from club-level use to larger competitions
+- ราคาประหยัด
+- ทำซ้ำได้
+- เป็น Modular
+- ซ่อมได้ในท้องถิ่น
+- มีเอกสารสำหรับผู้เริ่มต้น
+- ไม่ต้องพึ่งอินเทอร์เน็ตตลอดเวลา
+- ขยายจากระดับชมรมไปสู่การแข่งขันขนาดใหญ่ได้
 
-The intention is not merely to build an IoT demonstration. The system should ultimately be suitable for real competition use after adequate engineering validation and field testing.
+เป้าหมายไม่ใช่เพียงทำ IoT Demo แต่ต้องพัฒนาให้สามารถนำไปใช้ในการแข่งขันจริงได้ หลังผ่านการตรวจสอบทางวิศวกรรมและการทดสอบภาคสนามอย่างเพียงพอ
 
-## Current Status
+## สถานะปัจจุบัน
 
-**Stage: Prototype planning / hardware acquisition**
+**สถานะ: วางแผน Prototype / เตรียมจัดหา Hardware**
 
-Prototype V1 hardware is being selected and will be assembled first on a breadboard without soldering. Permanent soldering, enclosure design and PCB design will come only after the prototype circuit and firmware have been validated.
+Prototype V1 จะเริ่มประกอบบน Breadboard แบบไม่บัดกรีก่อน การบัดกรีถาวร การออกแบบกล่อง และการออกแบบ PCB จะเริ่มหลังวงจรและ Firmware ผ่านการทดสอบแล้วเท่านั้น
 
-## Origin / Credits
+## ที่มาและเครดิต
 
-Project initiated in 2026 by **E25XLD / HS8AC, Thailand**, with the goal of developing an accessible electronic punching platform for ARDF competition in Thailand.
+โครงการนี้ริเริ่มในปี 2026 โดย **E25XLD / HS8AC ประเทศไทย** เพื่อพัฒนาแพลตฟอร์ม Electronic Punching สำหรับการแข่งขัน ARDF ที่เข้าถึงได้ ราคาประหยัด และสามารถต่อยอดในประเทศไทยได้
 
-System architecture and engineering development are being documented from the first prototype onward so the project's origin and evolution remain traceable.
+สถาปัตยกรรม การออกแบบ และพัฒนาการของระบบจะถูกบันทึกตั้งแต่ Prototype รุ่นแรก เพื่อให้ที่มาและลำดับวิวัฒนาการของโครงการสามารถตรวจสอบย้อนหลังได้
 
 ---
 
-**HS8AC — Chumphon Amateur Radio Society**
+**HS8AC — สมาคมวิทยุสมัครเล่นจังหวัดชุมพร**
